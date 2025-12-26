@@ -1,0 +1,171 @@
+# Notification Service Configuration
+# Demonstrates Multithreading and WebSocket patterns
+
+server:
+  port: 8086
+
+spring:
+  application:
+    name: notification-service
+  
+  # MongoDB Configuration
+  data:
+    mongodb:
+      host: localhost
+      port: 27017
+      database: ecommerce_notifications
+      username: admin
+      password: admin123
+      authentication-database: admin
+  
+  # Kafka Configuration
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: notification-service
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
+      auto-offset-reset: earliest
+      enable-auto-commit: false
+    listener:
+      ack-mode: manual
+  
+  # Redis Configuration
+  redis:
+    host: localhost
+    port: 6379
+  
+  # Email Configuration (SMTP)
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${EMAIL_USERNAME:your-email@gmail.com}
+    password: ${EMAIL_PASSWORD:your-app-password}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+        transport:
+          protocol: smtp
+    default-encoding: UTF-8
+  
+  # Thymeleaf Configuration
+  thymeleaf:
+    cache: false
+    prefix: classpath:/templates/
+    suffix: .html
+
+# Eureka Client
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    prefer-ip-address: true
+
+# Actuator
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus,threaddump,scheduledtasks
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
+# Logging
+logging:
+  level:
+    root: INFO
+    com.ecommerce.notification: DEBUG
+    org.springframework.web.socket: DEBUG
+
+# Custom Application Properties
+app:
+  # Thread Pool Configuration
+  thread-pool:
+    # Email Thread Pool (Slow operations - SMTP can take 3-5 seconds)
+    email:
+      core-pool-size: 5         # Start with 5 threads
+      max-pool-size: 10         # Scale up to 10 threads
+      queue-capacity: 100       # Queue up to 100 emails
+      thread-name-prefix: "email-"
+    
+    # SMS Thread Pool (Medium speed - API calls 1-2 seconds)
+    sms:
+      core-pool-size: 3
+      max-pool-size: 8
+      queue-capacity: 50
+      thread-name-prefix: "sms-"
+    
+    # Push Notification Thread Pool (Fast - Firebase/FCM ~500ms)
+    push:
+      core-pool-size: 10
+      max-pool-size: 20
+      queue-capacity: 200
+      thread-name-prefix: "push-"
+    
+    # Scheduled Thread Pool (Cron jobs, batch processing)
+    scheduled:
+      pool-size: 2
+      thread-name-prefix: "scheduled-"
+    
+    # General Async Thread Pool
+    async:
+      core-pool-size: 8
+      max-pool-size: 16
+      queue-capacity: 100
+      thread-name-prefix: "async-"
+  
+  # Notification Settings
+  notification:
+    # Rate Limiting (prevent spam)
+    rate-limit:
+      max-per-user-per-minute: 10
+      max-per-user-per-hour: 100
+    
+    # Retry Configuration
+    retry:
+      max-attempts: 3
+      initial-delay: 1000      # 1 second
+      multiplier: 2            # Exponential backoff
+    
+    # Batch Processing
+    batch:
+      enabled: true
+      size: 100                # Process 100 notifications at a time
+      interval: 60000          # Every 60 seconds
+  
+  # WebSocket Configuration
+  websocket:
+    endpoint: /ws              # WebSocket connection endpoint
+    topic-prefix: /topic       # Public topics
+    user-prefix: /user         # User-specific queues
+    
+  # Email Templates
+  email:
+    from: "noreply@ecommerce.com"
+    from-name: "E-commerce Platform"
+    base-url: "http://localhost:3000"
+  
+  # SMS Configuration (Twilio simulation)
+  sms:
+    enabled: true
+    from-number: "+1234567890"
+  
+  # Push Notification Configuration (FCM simulation)
+  push:
+    enabled: true
+    fcm-api-key: ${FCM_API_KEY:dummy-key}
+
