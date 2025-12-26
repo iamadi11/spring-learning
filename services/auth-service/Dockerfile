@@ -1,6 +1,6 @@
 # Multi-stage Dockerfile for Auth Service
 # Stage 1: Build stage using Gradle
-FROM gradle:8.5-jdk21-alpine AS builder
+FROM gradle:8.5-jdk21 AS builder
 
 # Set working directory
 WORKDIR /app
@@ -21,10 +21,10 @@ COPY services/auth-service services/auth-service
 RUN gradle :services:auth-service:build -x test --no-daemon
 
 # Stage 2: Runtime stage with minimal JRE
-FROM eclipse-temurin:21-jre-alpine
+FROM eclipse-temurin:21-jre
 
 # Create non-root user for security
-RUN addgroup -S spring && adduser -S spring -G spring
+RUN groupadd -r spring && useradd -r -g spring spring
 
 # Set working directory
 WORKDIR /app
