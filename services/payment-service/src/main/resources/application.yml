@@ -1,0 +1,242 @@
+# Payment Service Configuration
+# Demonstrates comprehensive resilience patterns
+
+server:
+  port: 8085
+
+spring:
+  application:
+    name: payment-service
+  
+  # PostgreSQL Configuration
+  datasource:
+    url: jdbc:postgresql://localhost:5432/ecommerce_payment_db
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+      connection-timeout: 30000
+  
+  # JPA Configuration
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+  
+  # Flyway
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+  
+  # Redis
+  redis:
+    host: localhost
+    port: 6379
+    timeout: 3000ms
+  
+  # Cache
+  cache:
+    type: redis
+    redis:
+      time-to-live: 86400000  # 24 hours for idempotency
+  
+  # Kafka
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+# Eureka Client
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    prefer-ip-address: true
+
+# Resilience4j Configuration - COMPREHENSIVE PATTERNS
+resilience4j:
+  # Circuit Breaker Configuration
+  circuitbreaker:
+    instances:
+      paymentGateway:
+        # Circuit Breaker behavior
+        registerHealthIndicator: true  # Expose health endpoint
+        slidingWindowType: COUNT_BASED  # Count-based sliding window
+        slidingWindowSize: 10  # Last 10 requests
+        minimumNumberOfCalls: 5  # Need 5 calls before calculating failure rate
+        
+        # When to open circuit
+        failureRateThreshold: 50  # Open if 50% failures
+        slowCallRateThreshold: 50  # Also consider slow calls
+        slowCallDurationThreshold: 10s  # Slow if > 10 seconds
+        
+        # Open state behavior
+        waitDurationInOpenState: 30s  # Wait 30s before trying again
+        permittedNumberOfCallsInHalfOpenState: 3  # Test with 3 calls
+        
+        # Automatic transition
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+        
+        # What counts as failure
+        recordExceptions:
+          - java.io.IOException
+          - java.util.concurrent.TimeoutException
+          - org.springframework.web.client.ResourceAccessException
+        ignoreExceptions:
+          - com.ecommerce.payment.exception.PaymentDeclinedException
+          - com.ecommerce.payment.exception.InvalidCardException
+        
+        eventConsumerBufferSize: 10
+      
+      refundGateway:
+        registerHealthIndicator: true
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 5
+        failureRateThreshold: 50
+        waitDurationInOpenState: 30s
+        permittedNumberOfCallsInHalfOpenState: 3
+  
+  # Retry Configuration
+  retry:
+    instances:
+      paymentGateway:
+        maxAttempts: 3  # Retry up to 3 times
+        waitDuration: 1s  # Initial wait
+        enableExponentialBackoff: true  # 1s, 2s, 4s
+        exponentialBackoffMultiplier: 2
+        retryExceptions:
+          - java.io.IOException
+          - java.util.concurrent.TimeoutException
+        ignoreExceptions:
+          - com.ecommerce.payment.exception.PaymentDeclinedException
+      
+      refundGateway:
+        maxAttempts: 3
+        waitDuration: 1s
+        enableExponentialBackoff: true
+        exponentialBackoffMultiplier: 2
+  
+  # Rate Limiter Configuration
+  ratelimiter:
+    instances:
+      paymentGateway:
+        # Token Bucket algorithm
+        limitForPeriod: 10  # 10 requests
+        limitRefreshPeriod: 1s  # per second
+        timeoutDuration: 5s  # Wait up to 5s for token
+        registerHealthIndicator: true
+      
+      refundGateway:
+        limitForPeriod: 5  # 5 refunds per second
+        limitRefreshPeriod: 1s
+        timeoutDuration: 5s
+      
+      userPaymentAttempts:
+        limitForPeriod: 5  # 5 attempts
+        limitRefreshPeriod: 1m  # per minute (fraud prevention)
+        timeoutDuration: 0s  # Don't wait, fail immediately
+  
+  # Bulkhead Configuration (Thread Pool Isolation)
+  bulkhead:
+    instances:
+      paymentGateway:
+        maxConcurrentCalls: 50  # Max 50 concurrent payment calls
+        maxWaitDuration: 10s  # Wait up to 10s for slot
+      
+      refundGateway:
+        maxConcurrentCalls: 20  # Max 20 concurrent refund calls
+        maxWaitDuration: 10s
+  
+  thread-pool-bulkhead:
+    instances:
+      paymentProcessing:
+        maxThreadPoolSize: 80  # 80% of resources for payments
+        coreThreadPoolSize: 40
+        queueCapacity: 100
+        keepAliveDuration: 20s
+      
+      refundProcessing:
+        maxThreadPoolSize: 20  # 20% for refunds
+        coreThreadPoolSize: 10
+        queueCapacity: 50
+  
+  # Time Limiter Configuration
+  timelimiter:
+    instances:
+      paymentGateway:
+        timeoutDuration: 15s  # Fail if > 15 seconds
+        cancelRunningFuture: true
+      
+      refundGateway:
+        timeoutDuration: 20s  # Refunds can take longer
+        cancelRunningFuture: true
+
+# Actuator - Monitoring
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus,circuitbreakers,circuitbreakerevents,ratelimiters,bulkheads
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+  health:
+    circuitbreakers:
+      enabled: true
+    ratelimiters:
+      enabled: true
+
+# Logging
+logging:
+  level:
+    root: INFO
+    com.ecommerce.payment: DEBUG
+    io.github.resilience4j: DEBUG
+
+# Custom Application Properties
+app:
+  # Payment Gateway Configuration
+  payment-gateway:
+    stripe:
+      enabled: true
+      api-key: ${STRIPE_API_KEY:sk_test_dummy}
+      webhook-secret: ${STRIPE_WEBHOOK_SECRET:whsec_dummy}
+      timeout: 15000
+    
+    paypal:
+      enabled: false
+      client-id: ${PAYPAL_CLIENT_ID:dummy}
+      client-secret: ${PAYPAL_CLIENT_SECRET:dummy}
+  
+  # Idempotency
+  idempotency:
+    enabled: true
+    ttl-hours: 24  # Store for 24 hours
+  
+  # Fraud Detection
+  fraud:
+    enabled: true
+    max-failed-attempts: 5
+    lockout-duration-minutes: 30
+  
+  # Transaction Limits
+  limits:
+    max-transaction-amount: 10000.00  # $10,000
+    min-transaction-amount: 0.50  # $0.50
+    daily-user-limit: 50000.00  # $50,000 per day
+

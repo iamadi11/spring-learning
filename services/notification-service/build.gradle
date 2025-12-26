@@ -1,0 +1,54 @@
+// Build configuration for Notification Service
+// Demonstrates Multithreading and WebSocket patterns
+
+dependencies {
+    // Spring Boot Starters
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
+    
+    // WebSocket - Real-time notifications
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+    
+    // Eureka Client
+    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+    
+    // Config Client
+    implementation 'org.springframework.cloud:spring-cloud-starter-config'
+    
+    // Kafka - Event-driven notifications
+    implementation 'org.springframework.kafka:spring-kafka'
+    
+    // Redis - For caching and pub/sub
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    
+    // Email (SMTP)
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+    
+    // Thymeleaf - Email templates
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    
+    // MapStruct
+    implementation "org.mapstruct:mapstruct:${mapstructVersion}"
+    annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
+    
+    // Validation
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    
+    // Lombok
+    compileOnly "org.projectlombok:lombok:${lombokVersion}"
+    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+    
+    // Shared libraries
+    implementation project(':shared:common-lib')
+    implementation project(':shared:event-lib')
+    
+    // Testing
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation "org.testcontainers:mongodb:${testcontainersVersion}"
+    testImplementation "org.testcontainers:kafka:${testcontainersVersion}"
+}
+
+bootJar {
+    enabled = true
+}
+
