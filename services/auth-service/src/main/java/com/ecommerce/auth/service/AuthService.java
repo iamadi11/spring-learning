@@ -503,7 +503,7 @@ public class AuthService {
                 .imageUrl(user.getImageUrl())
                 .status(user.getStatus())
                 .tenantId(user.getTenantId())
-                .using2FA(user.isUsing2FA())
+                .using2FA(user.getUsing2FA())
                 // Convert roles to role names
                 .roles(user.getRoles().stream()
                         .map(Role::getName)
