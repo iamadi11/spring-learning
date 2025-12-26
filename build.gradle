@@ -27,7 +27,11 @@ ext {
     set('jjwtVersion', '0.12.3')
     
     // gRPC communication
-    set('grpcVersion', '2.15.0.RELEASE')
+    set('grpcVersion', '1.60.0')
+    set('grpcSpringBootVersion', '2.15.0.RELEASE')
+    
+    // Protocol Buffers
+    set('protobufVersion', '3.25.1')
     
     // Rate limiting
     set('bucket4jVersion', '8.5.0')

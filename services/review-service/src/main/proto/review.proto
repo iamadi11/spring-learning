@@ -1,0 +1,154 @@
+// Protocol Buffer Definition for Review Service
+// This file defines the gRPC service contract and message formats
+
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.ecommerce.review.grpc";
+option java_outer_classname = "ReviewServiceProto";
+
+package review;
+
+// Review Service Definition
+// Demonstrates various gRPC communication patterns:
+// - Unary RPC: Single request, single response
+// - Server Streaming RPC: Single request, stream of responses
+// - Client Streaming RPC: Stream of requests, single response
+// - Bidirectional Streaming RPC: Stream of requests and responses
+service ReviewService {
+  
+  // UNARY RPC - Most common pattern
+  // Single request → Single response
+  // Like traditional REST API call
+  rpc CreateReview(CreateReviewRequest) returns (ReviewResponse);
+  
+  rpc GetReview(GetReviewRequest) returns (ReviewResponse);
+  
+  rpc UpdateReview(UpdateReviewRequest) returns (ReviewResponse);
+  
+  rpc DeleteReview(DeleteReviewRequest) returns (DeleteReviewResponse);
+  
+  // SERVER STREAMING RPC
+  // Single request → Stream of responses
+  // Use case: Get all reviews for a product (large dataset)
+  // Server sends reviews one by one as stream
+  // Client receives reviews as they're ready
+  rpc GetProductReviews(GetProductReviewsRequest) returns (stream ReviewResponse);
+  
+  // CLIENT STREAMING RPC
+  // Stream of requests → Single response
+  // Use case: Bulk review upload
+  // Client sends multiple reviews
+  // Server processes all and returns summary
+  rpc BulkCreateReviews(stream CreateReviewRequest) returns (BulkReviewResponse);
+  
+  // BIDIRECTIONAL STREAMING RPC
+  // Stream of requests ↔ Stream of responses
+  // Use case: Real-time review moderation
+  // Client streams reviews for moderation
+  // Server streams moderation results back
+  rpc ModerateReviews(stream ReviewModerationRequest) returns (stream ReviewModerationResponse);
+  
+  // Additional operations
+  rpc GetUserReviews(GetUserReviewsRequest) returns (stream ReviewResponse);
+  
+  rpc GetReviewStats(GetReviewStatsRequest) returns (ReviewStatsResponse);
+}
+
+// Message Definitions
+
+message CreateReviewRequest {
+  int64 product_id = 1;
+  int64 user_id = 2;
+  int32 rating = 3;          // 1-5 stars
+  string title = 4;
+  string comment = 5;
+  bool verified_purchase = 6;
+}
+
+message GetReviewRequest {
+  string review_id = 1;
+}
+
+message UpdateReviewRequest {
+  string review_id = 1;
+  int32 rating = 2;
+  string title = 3;
+  string comment = 4;
+}
+
+message DeleteReviewRequest {
+  string review_id = 1;
+}
+
+message GetProductReviewsRequest {
+  int64 product_id = 1;
+  int32 page = 2;
+  int32 size = 3;
+  string sort_by = 4;        // rating, date, helpful_count
+}
+
+message GetUserReviewsRequest {
+  int64 user_id = 1;
+  int32 page = 2;
+  int32 size = 3;
+}
+
+message GetReviewStatsRequest {
+  int64 product_id = 1;
+}
+
+message ReviewModerationRequest {
+  string review_id = 1;
+  string action = 2;         // approve, reject, flag
+  string reason = 3;
+}
+
+// Response Messages
+
+message ReviewResponse {
+  string review_id = 1;
+  int64 product_id = 2;
+  int64 user_id = 3;
+  string user_name = 4;
+  int32 rating = 5;
+  string title = 6;
+  string comment = 7;
+  bool verified_purchase = 8;
+  int32 helpful_count = 9;
+  string status = 10;        // pending, approved, rejected
+  int64 created_at = 11;     // Unix timestamp
+  int64 updated_at = 12;
+}
+
+message DeleteReviewResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message BulkReviewResponse {
+  int32 total_received = 1;
+  int32 total_created = 2;
+  int32 total_failed = 3;
+  repeated string failed_reasons = 4;
+}
+
+message ReviewModerationResponse {
+  string review_id = 1;
+  bool success = 2;
+  string status = 3;
+  string message = 4;
+}
+
+message ReviewStatsResponse {
+  int64 product_id = 1;
+  double average_rating = 2;
+  int32 total_reviews = 3;
+  int32 five_star_count = 4;
+  int32 four_star_count = 5;
+  int32 three_star_count = 6;
+  int32 two_star_count = 7;
+  int32 one_star_count = 8;
+  int32 verified_purchase_count = 9;
+}
+

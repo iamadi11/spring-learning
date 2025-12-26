@@ -1,0 +1,97 @@
+// Build configuration for Review Service
+// Demonstrates gRPC communication patterns
+
+// Add protobuf plugin for .proto file compilation
+plugins {
+    id 'com.google.protobuf' version '0.9.4'
+}
+
+dependencies {
+    // Spring Boot Starters
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
+    
+    // Eureka Client
+    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+    
+    // Config Client
+    implementation 'org.springframework.cloud:spring-cloud-starter-config'
+    
+    // Redis - For caching
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    implementation 'org.springframework.boot:spring-boot-starter-cache'
+    
+    // Kafka
+    implementation 'org.springframework.kafka:spring-kafka'
+    
+    // gRPC Dependencies
+    implementation "io.grpc:grpc-netty-shaded:${grpcVersion}"
+    implementation "io.grpc:grpc-protobuf:${grpcVersion}"
+    implementation "io.grpc:grpc-stub:${grpcVersion}"
+    implementation "io.grpc:grpc-services:${grpcVersion}"
+    
+    // gRPC Spring Boot Starter
+    implementation "net.devh:grpc-spring-boot-starter:${grpcSpringBootVersion}"
+    implementation "net.devh:grpc-server-spring-boot-starter:${grpcSpringBootVersion}"
+    implementation "net.devh:grpc-client-spring-boot-starter:${grpcSpringBootVersion}"
+    
+    // Protocol Buffers
+    implementation "com.google.protobuf:protobuf-java:${protobufVersion}"
+    implementation "com.google.protobuf:protobuf-java-util:${protobufVersion}"
+    
+    // MapStruct
+    implementation "org.mapstruct:mapstruct:${mapstructVersion}"
+    annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
+    
+    // Validation
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    
+    // Lombok
+    compileOnly "org.projectlombok:lombok:${lombokVersion}"
+    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+    
+    // Shared libraries
+    implementation project(':shared:common-lib')
+    implementation project(':shared:event-lib')
+    
+    // Testing
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation "org.testcontainers:mongodb:${testcontainersVersion}"
+    testImplementation "io.grpc:grpc-testing:${grpcVersion}"
+}
+
+// Protobuf configuration
+protobuf {
+    protoc {
+        // Use protoc compiler version
+        artifact = "com.google.protobuf:protoc:${protobufVersion}"
+    }
+    
+    plugins {
+        // gRPC plugin
+        grpc {
+            artifact = "io.grpc:protoc-gen-grpc-java:${grpcVersion}"
+        }
+    }
+    
+    generateProtoTasks {
+        all()*.plugins {
+            grpc {}
+        }
+    }
+}
+
+// Add generated sources to source sets
+sourceSets {
+    main {
+        java {
+            srcDirs 'build/generated/source/proto/main/grpc'
+            srcDirs 'build/generated/source/proto/main/java'
+        }
+    }
+}
+
+bootJar {
+    enabled = true
+}
+
