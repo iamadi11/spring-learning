@@ -212,6 +212,86 @@ services:
       - ./grafana/provisioning:/etc/grafana/provisioning
     networks:
       - ecommerce-network
+  
+  # ==================== ELK STACK (CENTRALIZED LOGGING) ====================
+  
+  # Elasticsearch - Search and analytics engine for logs
+  # Stores and indexes all application logs
+  # Access at: http://localhost:9200
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
+    container_name: ecommerce-elasticsearch
+    environment:
+      # Single-node cluster for development
+      - discovery.type=single-node
+      # Disable security for development
+      - xpack.security.enabled=false
+      # JVM heap size (adjust based on available memory)
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ports:
+      # Elasticsearch HTTP API
+      - "9200:9200"
+      # Elasticsearch TCP transport
+      - "9300:9300"
+    volumes:
+      # Persist Elasticsearch data
+      - elasticsearch-data:/usr/share/elasticsearch/data
+    networks:
+      - ecommerce-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+  
+  # Logstash - Log processing pipeline
+  # Receives logs from services, processes them, and sends to Elasticsearch
+  logstash:
+    image: docker.elastic.co/logstash/logstash:8.11.0
+    container_name: ecommerce-logstash
+    depends_on:
+      - elasticsearch
+    ports:
+      # Logstash input (receives logs)
+      - "5000:5000"
+      # Logstash TCP input
+      - "5044:5044"
+    volumes:
+      # Logstash configuration
+      - ./logstash/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+    environment:
+      # Elasticsearch connection
+      - "LS_JAVA_OPTS=-Xms256m -Xmx256m"
+    networks:
+      - ecommerce-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9600/_node/stats || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+  
+  # Kibana - Visualization platform for Elasticsearch
+  # Provides UI for searching, viewing, and analyzing logs
+  # Access at: http://localhost:5601
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.11.0
+    container_name: ecommerce-kibana
+    depends_on:
+      - elasticsearch
+    ports:
+      - "5601:5601"
+    environment:
+      # Elasticsearch connection
+      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+      # Disable security for development
+      XPACK_SECURITY_ENABLED: "false"
+    networks:
+      - ecommerce-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:5601/api/status || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
 # Define named volumes for data persistence
 # Data persists even after containers are stopped/removed
@@ -225,6 +305,8 @@ volumes:
   prometheus-data:
     driver: local
   grafana-data:
+    driver: local
+  elasticsearch-data:
     driver: local
 
 # Define custom network for inter-container communication
