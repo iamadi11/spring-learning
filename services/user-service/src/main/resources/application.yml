@@ -1,0 +1,162 @@
+# User Service Configuration
+# Implements CQRS with PostgreSQL Primary-Replica Replication
+
+server:
+  port: 8082  # User Service port
+
+spring:
+  application:
+    name: user-service  # Service name for discovery
+  
+  # CQRS Datasource Configuration
+  # Primary database for write operations (commands)
+  datasource:
+    primary:
+      jdbc-url: jdbc:postgresql://localhost:5432/ecommerce_user_db
+      username: postgres
+      password: postgres
+      driver-class-name: org.postgresql.Driver
+      hikari:
+        maximum-pool-size: 10  # Connection pool for writes
+        minimum-idle: 5
+        connection-timeout: 20000
+        idle-timeout: 300000
+        max-lifetime: 1200000
+        pool-name: PrimaryHikariPool
+    
+    # Replica database for read operations (queries)
+    # In development, can point to same database
+    # In production, should point to read replica
+    replica:
+      jdbc-url: jdbc:postgresql://localhost:5432/ecommerce_user_db
+      username: postgres
+      password: postgres
+      driver-class-name: org.postgresql.Driver
+      hikari:
+        maximum-pool-size: 20  # Larger pool for read-heavy workload
+        minimum-idle: 10
+        connection-timeout: 20000
+        idle-timeout: 300000
+        max-lifetime: 1200000
+        pool-name: ReplicaHikariPool
+  
+  # JPA Configuration
+  jpa:
+    hibernate:
+      ddl-auto: validate  # Flyway handles schema
+    show-sql: false  # Disable in production
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        use_sql_comments: true
+        jdbc:
+          batch_size: 20  # Batch inserts/updates
+        order_inserts: true
+        order_updates: true
+  
+  # Flyway Migration
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+  
+  # Redis Caching
+  redis:
+    host: localhost
+    port: 6379
+    password:  # No password in development
+    timeout: 3000ms
+    jedis:
+      pool:
+        max-active: 8
+        max-idle: 8
+        min-idle: 2
+  
+  # Cache Configuration
+  cache:
+    type: redis
+    redis:
+      time-to-live: 900000  # 15 minutes default TTL
+      cache-null-values: false
+      use-key-prefix: true
+      key-prefix: "user-service:"
+  
+  # Kafka Configuration
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      acks: all  # Wait for all replicas
+      retries: 3
+    consumer:
+      group-id: user-service-group
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
+  
+  # Security - JWT Token Validation
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8081
+          jwk-set-uri: http://localhost:8081/.well-known/jwks.json
+
+# Eureka Client Configuration
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+
+# Actuator Configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
+# Logging Configuration
+logging:
+  level:
+    root: INFO
+    com.ecommerce.user: DEBUG
+    com.ecommerce.user.config.RoutingDataSource: DEBUG  # Log routing decisions
+    org.springframework.transaction: DEBUG  # Log transactions
+    org.hibernate.SQL: DEBUG  # Log SQL queries
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE  # Log query parameters
+
+# Custom Application Properties
+app:
+  # File Upload Configuration
+  upload:
+    avatar:
+      max-size: 5242880  # 5MB
+      allowed-types: image/jpeg,image/png,image/gif
+      path: uploads/avatars
+  
+  # Cache TTLs (in seconds)
+  cache:
+    user-profile: 900  # 15 minutes
+    addresses: 1800  # 30 minutes
+    preferences: 3600  # 1 hour
+  
+  # CQRS Configuration
+  cqrs:
+    replication-lag-tolerance-ms: 100  # Maximum acceptable replication lag
+    force-primary-after-write-seconds: 5  # Read from primary for N seconds after write
+
