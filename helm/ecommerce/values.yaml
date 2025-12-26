@@ -1,0 +1,200 @@
+# Default values for ecommerce-platform
+# Override these values using --set or -f values-prod.yaml
+
+global:
+  imageRegistry: ""
+  imagePullSecrets: []
+
+# Services configuration
+authService:
+  enabled: true
+  replicaCount: 3
+  image:
+    repository: ecommerce/auth-service
+    tag: "latest"
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 8086
+  resources:
+    requests:
+      cpu: 500m
+      memory: 512Mi
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+  autoscaling:
+    enabled: true
+    minReplicas: 3
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 70
+
+userService:
+  enabled: true
+  replicaCount: 3
+  image:
+    repository: ecommerce/user-service
+    tag: "latest"
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 8087
+  resources:
+    requests:
+      cpu: 500m
+      memory: 512Mi
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+
+productService:
+  enabled: true
+  replicaCount: 3
+  image:
+    repository: ecommerce/product-service
+    tag: "latest"
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 8088
+  resources:
+    requests:
+      cpu: 500m
+      memory: 512Mi
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+
+orderService:
+  enabled: true
+  replicaCount: 3
+  image:
+    repository: ecommerce/order-service
+    tag: "latest"
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 8089
+  resources:
+    requests:
+      cpu: 500m
+      memory: 512Mi
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+
+paymentService:
+  enabled: true
+  replicaCount: 3
+  image:
+    repository: ecommerce/payment-service
+    tag: "latest"
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 8090
+  resources:
+    requests:
+      cpu: 500m
+      memory: 512Mi
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+
+notificationService:
+  enabled: true
+  replicaCount: 3
+  image:
+    repository: ecommerce/notification-service
+    tag: "latest"
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 8091
+  resources:
+    requests:
+      cpu: 500m
+      memory: 512Mi
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+
+reviewService:
+  enabled: true
+  replicaCount: 3
+  image:
+    repository: ecommerce/review-service
+    tag: "latest"
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 8092
+  resources:
+    requests:
+      cpu: 500m
+      memory: 512Mi
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+
+# Ingress configuration
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/limit-rps: "100"
+  hosts:
+    - host: api.ecommerce.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: ecommerce-tls
+      hosts:
+        - api.ecommerce.com
+
+# PostgreSQL dependency
+postgresql:
+  enabled: true
+  auth:
+    username: postgres
+    password: password123
+    database: ecommerce_db
+  primary:
+    persistence:
+      enabled: true
+      size: 8Gi
+
+# MongoDB dependency
+mongodb:
+  enabled: true
+  auth:
+    enabled: true
+    rootPassword: admin123
+    username: admin
+    password: admin123
+    database: ecommerce_product_db
+  persistence:
+    enabled: true
+    size: 8Gi
+
+# Redis dependency
+redis:
+  enabled: true
+  auth:
+    enabled: false
+  master:
+    persistence:
+      enabled: true
+      size: 2Gi
+
+# Kafka dependency
+kafka:
+  enabled: true
+  replicaCount: 3
+  persistence:
+    enabled: true
+    size: 8Gi
+
