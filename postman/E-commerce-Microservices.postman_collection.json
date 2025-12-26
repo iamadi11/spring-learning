@@ -1,0 +1,881 @@
+{
+	"info": {
+		"_postman_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+		"name": "E-commerce Microservices Platform",
+		"description": "Complete API collection for the E-commerce Microservices Platform with 80+ endpoints. Features auto-authentication, sample data, environment variables, and test scripts.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{token}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Auto-refresh token if expired",
+					"const tokenExpiry = pm.environment.get('tokenExpiry');",
+					"const now = new Date().getTime();",
+					"",
+					"if (tokenExpiry && now > tokenExpiry && pm.environment.get('refreshToken')) {",
+					"    pm.sendRequest({",
+					"        url: pm.environment.get('baseUrl') + '/api/auth/refresh',",
+					"        method: 'POST',",
+					"        header: {",
+					"            'Content-Type': 'application/json'",
+					"        },",
+					"        body: {",
+					"            mode: 'raw',",
+					"            raw: JSON.stringify({",
+					"                refreshToken: pm.environment.get('refreshToken')",
+					"            })",
+					"        }",
+					"    }, function (err, res) {",
+					"        if (!err && res.code === 200) {",
+					"            const json = res.json();",
+					"            pm.environment.set('token', json.accessToken);",
+					"            pm.environment.set('refreshToken', json.refreshToken);",
+					"            pm.environment.set('tokenExpiry', now + (json.expiresIn * 1000));",
+					"        }",
+					"    });",
+					"}"
+				]
+			}
+		}
+	],
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Register",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"john.doe@example.com\",\n  \"password\": \"SecureP@ss123\",\n  \"username\": \"johndoe\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/register",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "auth", "register"]
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status is 201 Created', () => {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test('User ID returned', () => {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json.id).to.exist;",
+									"    pm.environment.set('userId', json.id);",
+									"});"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"john.doe@example.com\",\n  \"password\": \"SecureP@ss123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/login",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "auth", "login"]
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status is 200 OK', () => {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('JWT tokens returned', () => {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json.accessToken).to.exist;",
+									"    pm.expect(json.refreshToken).to.exist;",
+									"    ",
+									"    // Save tokens to environment",
+									"    pm.environment.set('token', json.accessToken);",
+									"    pm.environment.set('refreshToken', json.refreshToken);",
+									"    ",
+									"    // Calculate token expiry",
+									"    const now = new Date().getTime();",
+									"    const expiryTime = now + (json.expiresIn * 1000);",
+									"    pm.environment.set('tokenExpiry', expiryTime);",
+									"    ",
+									"    console.log('✅ JWT token saved to environment');",
+									"});"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Get Current User",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/me",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "auth", "me"]
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status is 200 OK', () => {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('User details returned', () => {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json.id).to.exist;",
+									"    pm.expect(json.email).to.exist;",
+									"});"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Refresh Token",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/refresh",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "auth", "refresh"]
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status is 200 OK', () => {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('New tokens returned', () => {",
+									"    const json = pm.response.json();",
+									"    pm.environment.set('token', json.accessToken);",
+									"    pm.environment.set('refreshToken', json.refreshToken);",
+									"});"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/logout",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "auth", "logout"]
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status is 204 No Content', () => {",
+									"    pm.response.to.have.status(204);",
+									"});"
+								]
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "User Service",
+			"item": [
+				{
+					"name": "Get My Profile",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/users/me/profile",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "users", "me", "profile"]
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status is 200 OK', () => {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Profile data returned', () => {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json.email).to.exist;",
+									"});"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Update My Profile",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"phone\": \"+1234567890\",\n  \"dateOfBirth\": \"1990-01-15\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/users/me/profile",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "users", "me", "profile"]
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status is 200 OK', () => {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Add Address",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"type\": \"SHIPPING\",\n  \"street\": \"123 Main St\",\n  \"city\": \"New York\",\n  \"state\": \"NY\",\n  \"zipCode\": \"10001\",\n  \"country\": \"USA\",\n  \"isDefault\": true\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/users/me/addresses",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "users", "me", "addresses"]
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status is 201 Created', () => {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test('Address ID returned', () => {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json.id).to.exist;",
+									"    pm.environment.set('testAddressId', json.id);",
+									"});"
+								]
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Product Service",
+			"item": [
+				{
+					"name": "List Products",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/products?page=0&size=20&sort=name&order=asc",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "products"],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "20"
+								},
+								{
+									"key": "sort",
+									"value": "name"
+								},
+								{
+									"key": "order",
+									"value": "asc"
+								}
+							]
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status is 200 OK', () => {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Products returned', () => {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json.content).to.be.an('array');",
+									"    if (json.content.length > 0) {",
+									"        pm.environment.set('testProductId', json.content[0].id);",
+									"    }",
+									"});"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Get Product",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/products/{{testProductId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "products", "{{testProductId}}"]
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status is 200 OK', () => {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Product details returned', () => {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json.id).to.exist;",
+									"    pm.expect(json.name).to.exist;",
+									"    pm.expect(json.price).to.exist;",
+									"});"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Create Product (Admin)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Wireless Headphones\",\n  \"description\": \"High-quality noise-cancelling headphones\",\n  \"price\": 299.99,\n  \"currency\": \"USD\",\n  \"stockQuantity\": 50,\n  \"categoryId\": \"electronics\",\n  \"specifications\": {\n    \"brand\": \"AudioTech\",\n    \"color\": \"Black\",\n    \"bluetooth\": \"5.0\"\n  }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/products",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "products"]
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status is 201 Created', () => {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test('Product ID returned', () => {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json.id).to.exist;",
+									"    pm.environment.set('testProductId', json.id);",
+									"});"
+								]
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Order Service",
+			"item": [
+				{
+					"name": "Create Order",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"items\": [\n    {\n      \"productId\": \"{{testProductId}}\",\n      \"quantity\": 2,\n      \"price\": 299.99\n    }\n  ],\n  \"shippingAddressId\": \"{{testAddressId}}\",\n  \"paymentMethod\": \"CREDIT_CARD\",\n  \"paymentDetails\": {\n    \"cardNumber\": \"4111111111111111\",\n    \"expiryMonth\": 12,\n    \"expiryYear\": 2025,\n    \"cvv\": \"123\"\n  }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/orders",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "orders"]
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status is 202 Accepted', () => {",
+									"    pm.response.to.have.status(202);",
+									"});",
+									"",
+									"pm.test('Order ID returned', () => {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json.orderId).to.exist;",
+									"    pm.environment.set('testOrderId', json.orderId);",
+									"});"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Get Order",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/orders/{{testOrderId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "orders", "{{testOrderId}}"]
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status is 200 OK', () => {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Order details returned', () => {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json.id).to.exist;",
+									"    pm.expect(json.status).to.exist;",
+									"});"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "List My Orders",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/orders/my-orders?page=0&size=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "orders", "my-orders"],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status is 200 OK', () => {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Orders list returned', () => {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json.content).to.be.an('array');",
+									"});"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Cancel Order",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/orders/{{testOrderId}}/cancel",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "orders", "{{testOrderId}}", "cancel"]
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status is 200 OK', () => {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								]
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Payment Service",
+			"item": [
+				{
+					"name": "Process Payment",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"orderId\": \"{{testOrderId}}\",\n  \"amount\": 599.98,\n  \"currency\": \"USD\",\n  \"paymentMethod\": \"CREDIT_CARD\",\n  \"cardDetails\": {\n    \"cardNumber\": \"4111111111111111\",\n    \"expiryMonth\": 12,\n    \"expiryYear\": 2025,\n    \"cvv\": \"123\",\n    \"cardholderName\": \"John Doe\"\n  }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/payments/process",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "payments", "process"]
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status is 200 OK', () => {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Payment ID returned', () => {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json.paymentId).to.exist;",
+									"    pm.environment.set('testPaymentId', json.paymentId);",
+									"});"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Refund Payment",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"amount\": 599.98,\n  \"reason\": \"Customer request\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/payments/{{testPaymentId}}/refund",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "payments", "{{testPaymentId}}", "refund"]
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status is 200 OK', () => {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								]
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Notification Service",
+			"item": [
+				{
+					"name": "Send Notification",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userId\": \"{{userId}}\",\n  \"type\": \"ORDER_CONFIRMATION\",\n  \"channels\": [\"EMAIL\", \"PUSH\"],\n  \"data\": {\n    \"orderNumber\": \"ORD-2024-001\",\n    \"total\": 599.98\n  }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/notifications/send",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "notifications", "send"]
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status is 202 Accepted', () => {",
+									"    pm.response.to.have.status(202);",
+									"});"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Get My Notifications",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/notifications/my-notifications?page=0&size=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "notifications", "my-notifications"],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status is 200 OK', () => {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								]
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Review Service",
+			"item": [
+				{
+					"name": "Create Review",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"productId\": \"{{testProductId}}\",\n  \"rating\": 5,\n  \"comment\": \"Excellent product! Highly recommended.\",\n  \"verified\": true\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/reviews",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "reviews"]
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status is 201 Created', () => {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test('Review ID returned', () => {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json.id).to.exist;",
+									"    pm.environment.set('testReviewId', json.id);",
+									"});"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Get Product Reviews",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/reviews/product/{{testProductId}}?page=0&size=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "reviews", "product", "{{testProductId}}"],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status is 200 OK', () => {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								]
+							}
+						}
+					]
+				}
+			]
+		}
+	]
+}
+

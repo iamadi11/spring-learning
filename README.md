@@ -21,15 +21,9 @@ This project includes comprehensive guides for every aspect:
 - **[DATABASE_SCHEMA.md](DATABASE_SCHEMA.md)** - PostgreSQL & MongoDB schemas
 
 ### Operations Guides
-- **[DEPLOYMENT_README.md](DEPLOYMENT_README.md)** - Complete deployment guide
-- **[PRODUCTION_DEPLOYMENT_GUIDE.md](PRODUCTION_DEPLOYMENT_GUIDE.md)** - Production best practices
-- **[COMPREHENSIVE_TESTING_GUIDE.md](COMPREHENSIVE_TESTING_GUIDE.md)** - Testing strategies
-- **[OBSERVABILITY_GUIDE.md](OBSERVABILITY_GUIDE.md)** - Monitoring & tracing
-- **[ADVANCED_FEATURES_GUIDE.md](ADVANCED_FEATURES_GUIDE.md)** - Advanced features
-
-### Status Documents
-- **[COMPLETION_SUMMARY.md](COMPLETION_SUMMARY.md)** - Final completion status
-- **[FINAL_IMPLEMENTATION_STATUS.md](FINAL_IMPLEMENTATION_STATUS.md)** - Implementation details
+- **[DEPLOYMENT.md](DEPLOYMENT.md)** - Complete production deployment guide
+- **[TESTING_GUIDE.md](TESTING_GUIDE.md)** - Comprehensive testing strategies
+- **[POSTMAN_GUIDE.md](POSTMAN_GUIDE.md)** - API testing with Postman collection
 
 ## 🏗️ Architecture Overview
 
@@ -49,52 +43,98 @@ This platform consists of **10 microservices** implementing enterprise-grade pat
 - **Notification Service** (Port 9006) - Multithreading, WebSocket
 - **Review Service** (Port 9007) - gRPC communication
 
-## 🚀 Quick Start
+## 🚀 Quick Start (5 Minutes!)
 
 ### Prerequisites
-- **Java 21** (LTS with Virtual Threads support)
-- **Docker** and **Docker Compose**
-- **Gradle** 8.x (included via wrapper)
+- **Docker Desktop** (latest version)
+- **Postman** (for API testing)
+- **Java 21** (optional, only needed for development)
 
-### Step 1: Start Infrastructure Services
-
-```bash
-# Navigate to docker directory
-cd docker
-
-# Start all infrastructure services (PostgreSQL, MongoDB, Redis, Kafka, Zipkin, etc.)
-docker-compose up -d
-
-# Verify all containers are running
-docker-compose ps
-
-# View logs
-docker-compose logs -f
-```
-
-**Services Started:**
-- PostgreSQL: `localhost:5432`
-- MongoDB: `localhost:27017`
-- Redis: `localhost:6379`
-- Kafka: `localhost:9092`
-- Kafka UI: `http://localhost:8090`
-- Zipkin: `http://localhost:9411`
-- Prometheus: `http://localhost:9090`
-- Grafana: `http://localhost:3000` (admin/admin)
-
-### Step 2: Build All Services
+### One-Command Startup
 
 ```bash
-# From project root
-./gradlew clean build
-
-# This will:
-# 1. Compile all Java classes
-# 2. Run all unit tests
-# 3. Create JAR files for each service
+# Start ALL services (infrastructure + 10 microservices) in Docker
+./start-local.sh
 ```
 
-### Step 3: Start Microservices (in order)
+**What this does:**
+1. ✅ Builds Docker images for all 10 microservices
+2. ✅ Starts infrastructure (PostgreSQL, MongoDB, Redis, Kafka, etc.)
+3. ✅ Starts all microservices in separate containers
+4. ✅ Waits for health checks to pass
+5. ✅ Opens Eureka dashboard automatically
+
+**Wait time:** ~2-3 minutes for all services to be healthy
+
+### Test with Postman
+
+```bash
+# 1. Import collection
+postman/E-commerce-Microservices.postman_collection.json
+
+# 2. Import environment
+postman/Local.postman_environment.json
+
+# 3. Select "Local Environment" (top right)
+
+# 4. Test APIs:
+- Run "Register" to create user
+- Run "Login" (JWT auto-saves!)
+- Run any API endpoint
+```
+
+See **[POSTMAN_GUIDE.md](POSTMAN_GUIDE.md)** for detailed testing instructions.
+
+### Stop All Services
+
+```bash
+./stop-local.sh
+```
+
+## 🌐 Service URLs (After Startup)
+
+### Infrastructure
+- **Eureka Dashboard:** http://localhost:8761
+- **API Gateway:** http://localhost:8080
+- **Prometheus:** http://localhost:9090
+- **Grafana:** http://localhost:3000 (admin/admin)
+- **Zipkin:** http://localhost:9411
+- **Kibana:** http://localhost:5601
+- **Kafka UI:** http://localhost:8090
+
+### Microservices (via API Gateway)
+All APIs accessed through: `http://localhost:8080/api/...`
+- Auth: `/api/auth`
+- Users: `/api/users`
+- Products: `/api/products`
+- Orders: `/api/orders`
+- Payments: `/api/payments`
+- Notifications: `/api/notifications`
+- Reviews: `/api/reviews`
+
+### Databases (Direct Access)
+- **PostgreSQL:** `localhost:5432` (postgres/postgres)
+- **MongoDB:** `localhost:27017` (admin/admin123)
+- **Redis:** `localhost:6379`
+
+## 📦 What's Running in Docker?
+
+After `./start-local.sh`, you have **10 microservices** running in separate containers:
+
+1. `ecommerce-eureka` - Service Discovery
+2. `ecommerce-config-server` - Configuration Management
+3. `ecommerce-api-gateway` - API Gateway
+4. `ecommerce-auth-service` - Authentication
+5. `ecommerce-user-service` - User Management
+6. `ecommerce-product-service` - Product Catalog
+7. `ecommerce-order-service` - Order Processing
+8. `ecommerce-payment-service` - Payments
+9. `ecommerce-notification-service` - Notifications
+10. `ecommerce-review-service` - Reviews
+
+Plus infrastructure: PostgreSQL, MongoDB, Redis, Kafka, Zipkin, Prometheus, Grafana, ELK Stack
+
+## 🛠️ Manual Build & Run (Development)
 
 ```bash
 # 1. Start Service Discovery first (other services need this)
@@ -133,6 +173,81 @@ docker-compose logs -f
    
 4. **Kafka UI**: `http://localhost:8090`
    - View topics and messages
+
+## 🧪 API Testing with Postman
+
+This project includes a comprehensive Postman collection with **80+ API endpoints**, auto-authentication, sample data, and test scripts.
+
+### Quick Test Flow
+
+**1. Import Collection**
+```
+File: postman/E-commerce-Microservices.postman_collection.json
+```
+
+**2. Import Environment**
+```
+File: postman/Local.postman_environment.json
+```
+
+**3. Select Environment**
+- Click environment dropdown (top right)
+- Select "Local Environment"
+
+**4. Test Complete User Journey**
+
+```
+Step 1: Authentication → Register
+  POST /api/auth/register
+  Creates user account
+
+Step 2: Authentication → Login
+  POST /api/auth/login
+  Returns JWT (auto-saved to {{token}})
+
+Step 3: User Service → Add Address
+  POST /api/users/me/addresses
+  Adds shipping address
+
+Step 4: Product Service → Create Product (Admin)
+  POST /api/products
+  Creates product (saves {{testProductId}})
+
+Step 5: Order Service → Create Order
+  POST /api/orders
+  Triggers Saga: Reserve Inventory → Process Payment → Confirm Order
+
+Step 6: Order Service → Get Order
+  GET /api/orders/{{testOrderId}}
+  View order status
+
+Step 7: Review Service → Create Review
+  POST /api/reviews
+  Write product review
+```
+
+### Features
+
+✅ **Auto-Authentication**: JWT tokens auto-save after login
+✅ **Smart Variables**: Response data auto-saves (userId, orderId, productId)
+✅ **Token Refresh**: Expired tokens auto-refresh
+✅ **Test Scripts**: Every request has automated validation
+✅ **Sample Data**: All requests include realistic sample data
+
+### View Results
+
+After each request:
+- **Body**: Response data
+- **Test Results**: Automated tests (✓ passed / ✗ failed)
+- **Console**: Detailed logs
+
+### Complete Guide
+
+See **[POSTMAN_GUIDE.md](POSTMAN_GUIDE.md)** for:
+- Detailed API documentation
+- Troubleshooting guide
+- Advanced features
+- Environment switching
 
 ## 📚 Key Concepts Covered
 
