@@ -232,6 +232,7 @@ public class TokenResponse {
      *   <li>HOBA - Origin-Bound Auth</li>
      * </ul>
      */
+    @Builder.Default
     private String tokenType = "Bearer";
 
     /**

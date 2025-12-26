@@ -47,6 +47,9 @@ dependencies {
     // Redis - For session storage and rate limiting
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     
+    // Swagger/OpenAPI - API Documentation
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
+    
     // Google Authenticator - For TOTP-based 2FA
     // Generates and validates time-based one-time passwords
     implementation 'com.warrenstrange:googleauth:1.5.0'

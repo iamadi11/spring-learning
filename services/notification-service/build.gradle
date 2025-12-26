@@ -27,6 +27,9 @@ dependencies {
     // Thymeleaf - Email templates
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     
+    // Swagger/OpenAPI - API Documentation
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
+    
     // Lombok (must be before MapStruct)
     compileOnly "org.projectlombok:lombok:${lombokVersion}"
     annotationProcessor "org.projectlombok:lombok:${lombokVersion}"

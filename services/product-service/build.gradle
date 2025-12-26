@@ -25,6 +25,9 @@ dependencies {
     // Kafka - For event publishing and consuming
     implementation 'org.springframework.kafka:spring-kafka'
     
+    // Swagger/OpenAPI - API Documentation
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
+    
     // Elasticsearch - For product search (optional, advanced feature)
     // implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
     
