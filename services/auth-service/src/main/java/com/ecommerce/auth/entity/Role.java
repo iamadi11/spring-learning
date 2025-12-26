@@ -2,6 +2,7 @@ package com.ecommerce.auth.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
@@ -74,6 +75,7 @@ import java.util.Set;
 @Data  // Lombok: generates getters, setters, toString, equals, hashCode
 @NoArgsConstructor  // Lombok: generates no-args constructor (required by JPA)
 @AllArgsConstructor  // Lombok: generates all-args constructor
+@Builder  // Lombok: generates builder pattern
 public class Role {
 
     /**
