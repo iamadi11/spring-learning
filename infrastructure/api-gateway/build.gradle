@@ -24,7 +24,7 @@ dependencies {
     implementation "io.github.resilience4j:resilience4j-circuitbreaker:${resilience4jVersion}"
     
     // Rate Limiting - Token bucket algorithm
-    implementation "com.github.vladimir-bukhtoyarov:bucket4j-core:${bucket4jVersion}"
+    implementation "com.bucket4j:bucket4j-core:${bucket4jVersion}"
     
     // JWT Support - For token validation
     implementation "io.jsonwebtoken:jjwt-api:${jjwtVersion}"
