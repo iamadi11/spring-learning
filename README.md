@@ -43,28 +43,36 @@ This platform consists of **10 microservices** implementing enterprise-grade pat
 - **Notification Service** (Port 9006) - Multithreading, WebSocket
 - **Review Service** (Port 9007) - gRPC communication
 
-## 🚀 Quick Start (5 Minutes!)
+## 🚀 Quick Start
 
 ### Prerequisites
 - **Docker Desktop** (latest version)
 - **Postman** (for API testing)
 - **Java 21** (optional, only needed for development)
 
-### One-Command Startup
+### Choose Your Setup
+
+#### Option 1: Minimal Setup (Recommended for < 8GB Docker RAM)
+**Perfect for:** Testing, learning, low-resource systems  
+**Memory:** 2-3 GB | **Time:** 8-10 minutes | **Services:** 5 core + 2 DBs
 
 ```bash
-# Start ALL services (infrastructure + 10 microservices) in Docker
+./start-minimal.sh
+```
+
+#### Option 2: Full Setup (Requires 12-16GB Docker RAM)
+**Perfect for:** Full-stack development, production simulation  
+**Memory:** 12-16 GB | **Time:** 10-15 minutes | **Services:** All 21 containers
+
+```bash
 ./start-local.sh
 ```
 
-**What this does:**
-1. ✅ Builds Docker images for all 10 microservices
-2. ✅ Starts infrastructure (PostgreSQL, MongoDB, Redis, Kafka, etc.)
-3. ✅ Starts all microservices in separate containers
-4. ✅ Waits for health checks to pass
-5. ✅ Opens Eureka dashboard automatically
+#### Option 3: Cloud Deployment (Zero local resources!)
+**Perfect for:** Production, 24/7 availability  
+See **[CLOUD_DEPLOYMENT_GUIDE.md](CLOUD_DEPLOYMENT_GUIDE.md)** for Railway, AWS, GCP, Azure
 
-**Wait time:** ~2-3 minutes for all services to be healthy
+**📖 Detailed guide:** [QUICK_START.md](QUICK_START.md) | [DEPLOYMENT_OPTIONS.md](DEPLOYMENT_OPTIONS.md)
 
 ### Test with Postman
 

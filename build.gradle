@@ -82,11 +82,11 @@ subprojects {
         // Micrometer - metrics collection for Prometheus
         implementation 'io.micrometer:micrometer-registry-prometheus'
         
-        // Spring Cloud Sleuth - distributed tracing with trace IDs
-        implementation 'org.springframework.cloud:spring-cloud-starter-sleuth'
+        // Micrometer Tracing - distributed tracing with trace IDs (replaces Sleuth)
+        implementation 'io.micrometer:micrometer-tracing-bridge-brave'
         
         // Zipkin - distributed tracing visualization
-        implementation 'org.springframework.cloud:spring-cloud-sleuth-zipkin'
+        implementation 'io.zipkin.reporter2:zipkin-reporter-brave'
         
         // Validation API - for @Valid, @NotNull, etc.
         implementation 'org.springframework.boot:spring-boot-starter-validation'
@@ -107,7 +107,7 @@ subprojects {
     }
 }
 
-// Root project has no code, so disable bootJar task
-tasks.named('bootJar') {
-    enabled = false
+// Root project has no code, so disable bootJar task if it exists
+afterEvaluate {
+    tasks.findByName('bootJar')?.enabled = false
 }
