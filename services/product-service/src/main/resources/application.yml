@@ -1,0 +1,177 @@
+# Product Service Configuration
+# Implements Event Sourcing with MongoDB and Sharding
+
+server:
+  port: 8083  # Product Service port
+
+spring:
+  application:
+    name: product-service  # Service name for discovery
+  
+  # MongoDB Configuration
+  data:
+    mongodb:
+      # Connection URI (supports replica sets and sharding)
+      uri: mongodb://localhost:27017/ecommerce_product_db
+      # Alternatively, individual properties:
+      # host: localhost
+      # port: 27017
+      # database: ecommerce_product_db
+      # username: ${MONGO_USERNAME:admin}
+      # password: ${MONGO_PASSWORD:password}
+      
+      # MongoDB Settings
+      auto-index-creation: true  # Automatically create indexes
+      uuid-representation: standard  # UUID representation
+      
+      # Connection Pool
+      # mongodb.connection-pool:
+      #   max-size: 100  # Maximum connections
+      #   min-size: 10   # Minimum connections
+      #   max-wait-time: 2000  # Wait time in ms
+      #   max-connection-life-time: 0  # 0 = no limit
+      #   max-connection-idle-time: 0  # 0 = no limit
+  
+  # Redis Caching
+  redis:
+    host: localhost
+    port: 6379
+    password:  # No password in development
+    timeout: 3000ms
+    lettuce:
+      pool:
+        max-active: 8
+        max-idle: 8
+        min-idle: 2
+  
+  # Cache Configuration
+  cache:
+    type: redis
+    redis:
+      time-to-live: 3600000  # 1 hour default TTL
+      cache-null-values: false
+      use-key-prefix: true
+      key-prefix: "product-service:"
+  
+  # Kafka Configuration
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      acks: all  # Wait for all replicas
+      retries: 3
+      properties:
+        enable.idempotence: true  # Exactly-once semantics
+    consumer:
+      group-id: product-service-group
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
+      auto-offset-reset: earliest
+  
+  # Security - JWT Token Validation
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8081
+          jwk-set-uri: http://localhost:8081/.well-known/jwks.json
+
+# Eureka Client Configuration
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+
+# Actuator Configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
+# Logging Configuration
+logging:
+  level:
+    root: INFO
+    com.ecommerce.product: DEBUG
+    org.springframework.data.mongodb: DEBUG  # MongoDB queries
+    org.springframework.kafka: INFO  # Kafka logs
+
+# Custom Application Properties
+app:
+  # Event Sourcing Configuration
+  event-sourcing:
+    enabled: true
+    snapshot-frequency: 100  # Create snapshot every 100 events
+    replay-batch-size: 1000  # Replay events in batches
+  
+  # MongoDB Sharding Configuration
+  sharding:
+    enabled: false  # Enable in production with sharded cluster
+    shard-key: category_id  # Primary shard key
+    
+  # Product Configuration
+  product:
+    max-images: 10  # Maximum images per product
+    max-variants: 50  # Maximum variants per product
+    default-currency: USD
+    
+  # Search Configuration
+  search:
+    max-results: 1000  # Maximum search results
+    default-page-size: 20
+    
+  # Cache TTLs (in seconds)
+  cache:
+    product-details: 3600  # 1 hour
+    category-products: 1800  # 30 minutes
+    search-results: 900  # 15 minutes
+    
+  # File Upload Configuration
+  upload:
+    product-images:
+      max-size: 5242880  # 5MB per image
+      allowed-types: image/jpeg,image/png,image/webp
+      path: uploads/products
+
+# MongoDB Indexing Strategy
+mongodb:
+  indexes:
+    products:
+      - keys: { product_id: 1 }
+        unique: true
+      - keys: { category_id: 1, created_at: -1 }
+      - keys: { name: "text", description: "text" }
+        language_override: "language"
+      - keys: { price: 1 }
+      - keys: { stock: 1 }
+      - keys: { active: 1, featured: 1 }
+    
+    product_events:
+      - keys: { aggregate_id: 1, version: 1 }
+        unique: true
+      - keys: { aggregate_id: 1, timestamp: -1 }
+      - keys: { event_type: 1, timestamp: -1 }
+    
+    categories:
+      - keys: { category_id: 1 }
+        unique: true
+      - keys: { parent_id: 1 }
+      - keys: { slug: 1 }
+        unique: true
+

@@ -1,0 +1,54 @@
+// Build configuration for Product Service
+// Implements Event Sourcing pattern with MongoDB and sharding
+
+dependencies {
+    // Spring Boot Starters
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
+    
+    // Spring Security - for securing endpoints
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    
+    // OAuth2 Resource Server - for validating JWT tokens
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
+    
+    // Eureka Client - Service Discovery
+    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+    
+    // Config Client - Centralized Configuration
+    implementation 'org.springframework.cloud:spring-cloud-starter-config'
+    
+    // Redis - For caching product queries
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    implementation 'org.springframework.boot:spring-boot-starter-cache'
+    
+    // Kafka - For event publishing and consuming
+    implementation 'org.springframework.kafka:spring-kafka'
+    
+    // Elasticsearch - For product search (optional, advanced feature)
+    // implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
+    
+    // MapStruct - DTO to Entity mapping
+    implementation "org.mapstruct:mapstruct:${mapstructVersion}"
+    annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
+    
+    // Validation
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    
+    // Shared libraries
+    implementation project(':shared:common-lib')
+    implementation project(':shared:event-lib')
+    
+    // Testing
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+    testImplementation "org.testcontainers:mongodb:${testcontainersVersion}"
+    testImplementation "org.testcontainers:kafka:${testcontainersVersion}"
+    testImplementation 'de.flapdoodle.embed:de.flapdoodle.embed.mongo:4.11.0'
+}
+
+// Enable bootJar to create executable JAR
+bootJar {
+    enabled = true
+}
+

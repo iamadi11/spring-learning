@@ -37,14 +37,16 @@ services:
       retries: 5
   
   # MongoDB - Document database for flexible schema data
-  # Used by: Product Service, Review Service, Notification Service
+  # Used by: Product Service (Event Sourcing), Review Service, Notification Service
   mongodb:
-    image: mongo:6
+    image: mongo:7.0
     container_name: ecommerce-mongodb
     environment:
       # Root username and password
       MONGO_INITDB_ROOT_USERNAME: admin
       MONGO_INITDB_ROOT_PASSWORD: admin123
+      # Initialize product database
+      MONGO_INITDB_DATABASE: ecommerce_product_db
     ports:
       # Map MongoDB port
       - "27017:27017"
