@@ -1,0 +1,105 @@
+# Review Service Configuration
+# Demonstrates gRPC communication patterns
+
+server:
+  port: 8087
+
+spring:
+  application:
+    name: review-service
+  
+  # MongoDB Configuration
+  data:
+    mongodb:
+      host: localhost
+      port: 27017
+      database: ecommerce_reviews
+      username: admin
+      password: admin123
+      authentication-database: admin
+  
+  # Redis Configuration
+  redis:
+    host: localhost
+    port: 6379
+    timeout: 3000ms
+  
+  # Cache Configuration
+  cache:
+    type: redis
+    redis:
+      time-to-live: 3600000  # 1 hour
+  
+  # Kafka Configuration
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+# Eureka Client
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    prefer-ip-address: true
+
+# gRPC Server Configuration
+grpc:
+  server:
+    port: 9090
+    max-inbound-message-size: 10MB
+    max-inbound-metadata-size: 8KB
+    enable-keep-alive: true
+    keep-alive-time: 30s
+    keep-alive-timeout: 5s
+    permit-keep-alive-without-calls: true
+    max-connection-idle: 5m
+    max-connection-age: 30m
+    max-connection-age-grace: 5m
+
+# Actuator
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
+# Logging
+logging:
+  level:
+    root: INFO
+    com.ecommerce.review: DEBUG
+    io.grpc: DEBUG
+    net.devh.boot.grpc: DEBUG
+
+# Custom Application Properties
+app:
+  review:
+    # Moderation settings
+    moderation:
+      enabled: true
+      auto-approve-verified-purchase: true
+      profanity-check: true
+    
+    # Rating settings
+    rating:
+      min: 1
+      max: 5
+    
+    # Review limits
+    limits:
+      max-title-length: 100
+      max-comment-length: 5000
+      max-images: 5
+
