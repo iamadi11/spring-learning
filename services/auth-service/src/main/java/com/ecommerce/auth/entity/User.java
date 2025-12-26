@@ -1,15 +1,23 @@
 package com.ecommerce.auth.entity;
 
+import com.ecommerce.auth.enums.AuthProvider;
+import com.ecommerce.auth.enums.UserStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * User Entity - Represents a user account in the system
@@ -94,22 +102,18 @@ import java.util.Set;
 @Data  // Lombok: generates getters, setters, toString, equals, hashCode
 @NoArgsConstructor  // Lombok: generates no-args constructor (required by JPA)
 @AllArgsConstructor  // Lombok: generates all-args constructor
-public class User {
+@Builder  // Lombok: generates builder pattern
+public class User implements UserDetails {
 
     /**
      * Unique identifier for the user
      * 
-     * <p>Using UUID instead of auto-increment for:</p>
-     * <ul>
-     *   <li>Global uniqueness across distributed systems</li>
-     *   <li>Security (non-sequential, unpredictable)</li>
-     *   <li>Easier data migration and merging</li>
-     * </ul>
+     * <p>Using Long for auto-increment primary key</p>
      */
     @Id  // JPA: primary key
-    @GeneratedValue(strategy = GenerationType.UUID)  // Auto-generate UUID
+    @GeneratedValue(strategy = GenerationType.IDENTITY)  // Auto-increment
     @Column(name = "id", updatable = false, nullable = false)
-    private String id;
+    private Long id;
 
     /**
      * Email address - used as username for login
@@ -123,6 +127,12 @@ public class User {
      */
     @Column(name = "email", unique = true, nullable = false, length = 255)
     private String email;
+
+    /**
+     * Username - unique identifier chosen by user
+     */
+    @Column(name = "username", nullable = false, length = 50)
+    private String username;
 
     /**
      * Password hash - BCrypt hashed password
@@ -146,12 +156,16 @@ public class User {
     private String password;
 
     /**
-     * User's full name
-     * 
-     * <p>Displayed in UI, emails, and invoices</p>
+     * User's first name
      */
-    @Column(name = "name", nullable = false, length = 255)
-    private String name;
+    @Column(name = "first_name", length = 50)
+    private String firstName;
+
+    /**
+     * User's last name
+     */
+    @Column(name = "last_name", length = 50)
+    private String lastName;
 
     /**
      * Email verification status
@@ -162,6 +176,7 @@ public class User {
      * <p>Unverified users may have limited functionality until verification</p>
      */
     @Column(name = "email_verified", nullable = false)
+    @Builder.Default
     private Boolean emailVerified = false;
 
     /**
@@ -178,6 +193,7 @@ public class User {
      * </ul>
      */
     @Column(name = "enabled", nullable = false)
+    @Builder.Default
     private Boolean enabled = true;
 
     /**
@@ -196,6 +212,7 @@ public class User {
      * <p>To unlock: Admin action or automatic after timeout period</p>
      */
     @Column(name = "locked", nullable = false)
+    @Builder.Default
     private Boolean locked = false;
 
     /**
@@ -205,7 +222,8 @@ public class User {
      * false: 2FA not enabled (password only)</p>
      */
     @Column(name = "two_factor_enabled", nullable = false)
-    private Boolean twoFactorEnabled = false;
+    @Builder.Default
+    private Boolean using2FA = false;
 
     /**
      * Two-Factor Authentication secret key
@@ -244,7 +262,8 @@ public class User {
      */
     @Enumerated(EnumType.STRING)  // Store enum as string in database
     @Column(name = "provider", nullable = false, length = 20)
-    private AuthProvider provider = AuthProvider.LOCAL;
+    @Builder.Default
+    private AuthProvider authProvider = AuthProvider.LOCAL;
 
     /**
      * Provider-specific user ID
@@ -263,6 +282,20 @@ public class User {
      */
     @Column(name = "provider_id", length = 255)
     private String providerId;
+
+    /**
+     * Profile image URL
+     */
+    @Column(name = "image_url", length = 500)
+    private String imageUrl;
+
+    /**
+     * User account status
+     */
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false, length = 20)
+    @Builder.Default
+    private UserStatus status = UserStatus.PENDING;
 
     /**
      * Tenant ID - for multi-tenancy support
@@ -317,6 +350,7 @@ public class User {
         joinColumns = @JoinColumn(name = "user_id"),  // This entity's foreign key
         inverseJoinColumns = @JoinColumn(name = "role_id")  // Other entity's foreign key
     )
+    @Builder.Default
     private Set<Role> roles = new HashSet<>();
 
     /**
@@ -398,7 +432,7 @@ public class User {
      * @return true if account created via OAuth2 provider
      */
     public boolean isSocialLogin() {
-        return provider != AuthProvider.LOCAL;
+        return authProvider != AuthProvider.LOCAL;
     }
 
     /**
@@ -416,17 +450,44 @@ public class User {
     public boolean canLogin() {
         return emailVerified && enabled && !locked;
     }
-}
 
-/**
- * Authentication Provider Enum
- * 
- * <p>Defines supported authentication methods</p>
- */
-enum AuthProvider {
-    LOCAL,      // Username/password
-    GOOGLE,     // Google OAuth2
-    GITHUB,     // GitHub OAuth2
-    FACEBOOK    // Facebook OAuth2
+    // ==================== UserDetails Interface Methods ====================
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return roles.stream()
+                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getName()))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public String getPassword() {
+        return password;
+    }
+
+    @Override
+    public String getUsername() {
+        return email; // Use email as username for Spring Security
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return !locked;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return enabled && emailVerified && status == UserStatus.ACTIVE;
+    }
 }
 

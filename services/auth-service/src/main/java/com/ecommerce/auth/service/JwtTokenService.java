@@ -267,19 +267,19 @@ public class JwtTokenService {
             // 1. Signature is valid (token not tampered with)
             // 2. Token is not expired
             // 3. Token format is valid
-            Jws<Claims> claims = Jwts.parserBuilder()
+            Jws<Claims> claims = Jwts.parser()
                     // Set the signing key to verify signature
-                    .setSigningKey(secretKey)
+                    .verifyWith(secretKey)
                     
                     // Build the parser
                     .build()
                     
                     // Parse the JWT token
                     // Throws JwtException if any validation fails
-                    .parseClaimsJws(token);
+                    .parseSignedClaims(token);
             
             // Additional validation: Check issuer matches our configuration
-            String issuer = claims.getBody().getIssuer();
+            String issuer = claims.getPayload().getIssuer();
             if (!jwtConfig.getIssuer().equals(issuer)) {
                 // Issuer mismatch - token from different service
                 logger.warn("Invalid token issuer: {}", issuer);
@@ -328,18 +328,18 @@ public class JwtTokenService {
     public String getEmailFromToken(String token) {
         // Parse token and extract claims
         // The subject claim contains the user email
-        return Jwts.parserBuilder()
+        return Jwts.parser()
                 // Set signing key
-                .setSigningKey(secretKey)
+                .verifyWith(secretKey)
                 
                 // Build parser
                 .build()
                 
                 // Parse token
-                .parseClaimsJws(token)
+                .parseSignedClaims(token)
                 
                 // Get claims body
-                .getBody()
+                .getPayload()
                 
                 // Get subject claim (email)
                 .getSubject();
@@ -355,18 +355,18 @@ public class JwtTokenService {
      */
     public Claims getClaimsFromToken(String token) {
         // Parse token and return all claims
-        return Jwts.parserBuilder()
+        return Jwts.parser()
                 // Set signing key
-                .setSigningKey(secretKey)
+                .verifyWith(secretKey)
                 
                 // Build parser
                 .build()
                 
                 // Parse token
-                .parseClaimsJws(token)
+                .parseSignedClaims(token)
                 
                 // Get claims body (contains all claims)
-                .getBody();
+                .getPayload();
     }
 
     /**

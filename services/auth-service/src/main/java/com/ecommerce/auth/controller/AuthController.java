@@ -229,9 +229,8 @@ public class AuthController {
         
         // Build API response with success message
         ApiResponse<UserResponse> response = ApiResponse.success(
-                userResponse,  // User data
                 "Registration successful. Please check your email to verify your account.",  // Message
-                httpRequest.getRequestURI()  // Request path
+                userResponse  // User data
         );
         
         // Return ResponseEntity with 201 Created status
@@ -331,9 +330,7 @@ public class AuthController {
         
         // Build API response with success message
         ApiResponse<Void> response = ApiResponse.success(
-                null,  // No data to return
-                "Logout successful",  // Message
-                httpRequest.getRequestURI()  // Request path
+                "Logout successful"  // Message
         );
         
         // Return ResponseEntity with 200 OK status

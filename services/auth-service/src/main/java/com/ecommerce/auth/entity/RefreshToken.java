@@ -2,11 +2,12 @@ package com.ecommerce.auth.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 /**
  * Refresh Token Entity - Stores refresh tokens for JWT authentication
@@ -115,15 +116,16 @@ import java.time.LocalDateTime;
 @Data  // Lombok: generates getters, setters, toString, equals, hashCode
 @NoArgsConstructor  // Lombok: generates no-args constructor (required by JPA)
 @AllArgsConstructor  // Lombok: generates all-args constructor
+@Builder  // Lombok: generates builder pattern
 public class RefreshToken {
 
     /**
      * Unique identifier for the refresh token record
      */
     @Id  // JPA: primary key
-    @GeneratedValue(strategy = GenerationType.UUID)  // Auto-generate UUID
+    @GeneratedValue(strategy = GenerationType.IDENTITY)  // Auto-increment
     @Column(name = "id", updatable = false, nullable = false)
-    private String id;
+    private Long id;
 
     /**
      * The refresh token value
@@ -179,13 +181,13 @@ public class RefreshToken {
      * 
      * <p>Validation:</p>
      * <pre>
-     * if (LocalDateTime.now().isAfter(refreshToken.getExpiresAt())) {
+     * if (Instant.now().isAfter(refreshToken.getExpiryDate())) {
      *     throw new TokenExpiredException("Refresh token expired");
      * }
      * </pre>
      */
-    @Column(name = "expires_at", nullable = false)
-    private LocalDateTime expiresAt;
+    @Column(name = "expiry_date", nullable = false)
+    private Instant expiryDate;
 
     /**
      * Whether the token has been revoked
@@ -202,6 +204,7 @@ public class RefreshToken {
      * </ul>
      */
     @Column(name = "revoked", nullable = false)
+    @Builder.Default
     private Boolean revoked = false;
 
     /**
@@ -231,9 +234,8 @@ public class RefreshToken {
     /**
      * Timestamp when the token was created
      */
-    @CreationTimestamp  // Hibernate: auto-set on insert
     @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+    private Instant createdAt;
 
     /**
      * Timestamp when the token was last used
@@ -241,7 +243,7 @@ public class RefreshToken {
      * <p>Updated each time token is used to refresh access token</p>
      */
     @Column(name = "last_used_at")
-    private LocalDateTime lastUsedAt;
+    private Instant lastUsedAt;
 
     // ==================== Helper Methods ====================
 
@@ -251,7 +253,7 @@ public class RefreshToken {
      * @return true if token is past expiration date
      */
     public boolean isExpired() {
-        return LocalDateTime.now().isAfter(expiresAt);
+        return Instant.now().isAfter(expiryDate);
     }
 
     /**
@@ -274,7 +276,7 @@ public class RefreshToken {
      * Update last used timestamp
      */
     public void updateLastUsed() {
-        this.lastUsedAt = LocalDateTime.now();
+        this.lastUsedAt = Instant.now();
     }
 
     /**
@@ -284,7 +286,7 @@ public class RefreshToken {
      */
     public boolean isExpiringSoon() {
         return !isExpired() && 
-               LocalDateTime.now().plusHours(24).isAfter(expiresAt);
+               Instant.now().plusSeconds(24 * 3600).isAfter(expiryDate);
     }
 }
 

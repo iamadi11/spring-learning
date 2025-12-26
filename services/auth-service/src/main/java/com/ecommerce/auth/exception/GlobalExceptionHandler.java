@@ -145,12 +145,7 @@ public class GlobalExceptionHandler {
         });
         
         // Create custom API response with errors
-        ApiResponse<Map<String, String>> response = new ApiResponse<>();
-        response.setTimestamp(java.time.LocalDateTime.now());
-        response.setStatus(HttpStatus.BAD_REQUEST.value());
-        response.setMessage("Validation failed");
-        response.setData(errors);
-        response.setPath(request.getRequestURI());
+        ApiResponse<Map<String, String>> response = ApiResponse.error("Validation failed", errors);
         
         // Return 400 Bad Request
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
@@ -188,11 +183,7 @@ public class GlobalExceptionHandler {
         
         // Create generic error response (security best practice)
         // Don't reveal if email exists or which part failed
-        ApiResponse<Void> response = ApiResponse.error(
-                HttpStatus.UNAUTHORIZED,
-                "Invalid email or password",
-                request.getRequestURI()
-        );
+        ApiResponse<Void> response = ApiResponse.error("Invalid email or password");
         
         // Return 401 Unauthorized
         return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
@@ -236,9 +227,7 @@ public class GlobalExceptionHandler {
         
         // Create error response
         ApiResponse<Void> response = ApiResponse.error(
-                status,
-                message != null ? message : "An error occurred",
-                request.getRequestURI()
+                message != null ? message : "An error occurred"
         );
         
         // Return ResponseEntity with appropriate status
@@ -265,9 +254,7 @@ public class GlobalExceptionHandler {
         
         // Create generic error response (don't expose internal details)
         ApiResponse<Void> response = ApiResponse.error(
-                HttpStatus.INTERNAL_SERVER_ERROR,
-                "An unexpected error occurred. Please try again later.",
-                request.getRequestURI()
+                "An unexpected error occurred. Please try again later."
         );
         
         // Return 500 Internal Server Error

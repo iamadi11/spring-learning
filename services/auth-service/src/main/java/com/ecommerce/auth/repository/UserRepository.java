@@ -46,10 +46,10 @@ import java.util.Optional;
  * @since 2024-01-01
  */
 @Repository  // Spring annotation: marks this as a repository component
-public interface UserRepository extends JpaRepository<User, String> {
-    // JpaRepository<User, String> means:
+public interface UserRepository extends JpaRepository<User, Long> {
+    // JpaRepository<User, Long> means:
     // - Entity type: User
-    // - Primary key type: String
+    // - Primary key type: Long
 
     /**
      * Find user by email address
@@ -98,6 +98,28 @@ public interface UserRepository extends JpaRepository<User, String> {
      * </pre>
      */
     boolean existsByEmail(String email);
+
+    /**
+     * Find user by username and tenant ID
+     * 
+     * <p>Used for login with username in multi-tenant environment</p>
+     * 
+     * @param username Username
+     * @param tenantId Tenant ID
+     * @return Optional containing user if found
+     */
+    Optional<User> findByUsernameAndTenantId(String username, String tenantId);
+
+    /**
+     * Check if username exists within a tenant
+     * 
+     * <p>Used for registration: prevent duplicate usernames within tenant</p>
+     * 
+     * @param username Username to check
+     * @param tenantId Tenant ID
+     * @return true if username exists in tenant
+     */
+    boolean existsByUsernameAndTenantId(String username, String tenantId);
 
     /**
      * Find all users belonging to a tenant
@@ -249,7 +271,9 @@ public interface UserRepository extends JpaRepository<User, String> {
      * </pre>
      */
     @Query("SELECT u FROM User u WHERE u.tenantId = :tenantId AND " +
-           "(LOWER(u.name) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
+           "(LOWER(u.firstName) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
+           "LOWER(u.lastName) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
+           "LOWER(u.username) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
            "LOWER(u.email) LIKE LOWER(CONCAT('%', :searchTerm, '%')))")
     List<User> searchUsers(
         @Param("tenantId") String tenantId,
