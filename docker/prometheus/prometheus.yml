@@ -1,0 +1,79 @@
+# Prometheus Configuration
+# Defines how Prometheus scrapes metrics from services
+
+# Global configuration
+global:
+  # How frequently to scrape targets (collect metrics)
+  scrape_interval: 15s
+  # How long to wait before timing out a scrape
+  scrape_timeout: 10s
+  # How frequently to evaluate alerting rules
+  evaluation_interval: 15s
+
+# Scrape configurations - define what to monitor
+scrape_configs:
+  # Monitor Prometheus itself
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+  
+  # Monitor Service Discovery (Eureka)
+  - job_name: 'service-discovery'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['service-discovery:8761']
+  
+  # Monitor Config Server
+  - job_name: 'config-server'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['config-server:8888']
+  
+  # Monitor API Gateway
+  - job_name: 'api-gateway'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['api-gateway:8080']
+  
+  # Monitor Auth Service
+  - job_name: 'auth-service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['auth-service:9001']
+  
+  # Monitor User Service
+  - job_name: 'user-service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['user-service:9002']
+  
+  # Monitor Product Service
+  - job_name: 'product-service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['product-service:9003']
+  
+  # Monitor Order Service
+  - job_name: 'order-service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['order-service:9004']
+  
+  # Monitor Payment Service
+  - job_name: 'payment-service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['payment-service:9005']
+  
+  # Monitor Notification Service
+  - job_name: 'notification-service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['notification-service:9006']
+  
+  # Monitor Review Service
+  - job_name: 'review-service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['review-service:9007']
+

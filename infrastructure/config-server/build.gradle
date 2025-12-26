@@ -1,0 +1,18 @@
+// Build configuration for Config Server
+// Provides centralized configuration management for all microservices
+
+dependencies {
+    // Spring Cloud Config Server - Centralized configuration management
+    // Allows externalization of configuration in a distributed system
+    implementation 'org.springframework.cloud:spring-cloud-config-server'
+    
+    // Eureka Client - Register this Config Server with Service Discovery
+    // This allows other services to discover the Config Server dynamically
+    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+}
+
+// Enable bootJar to create executable JAR
+bootJar {
+    enabled = true
+}
+

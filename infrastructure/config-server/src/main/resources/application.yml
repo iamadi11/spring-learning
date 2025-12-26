@@ -1,0 +1,114 @@
+# Config Server Configuration
+# This file configures the centralized configuration server
+
+# Spring Boot application configuration
+spring:
+  application:
+    # Application name - used for identification
+    name: config-server
+  
+  # Spring Cloud Config Server configuration
+  cloud:
+    config:
+      server:
+        # Git backend configuration (preferred for production)
+        # Uncomment the following section to use Git repository
+        #git:
+        #  uri: https://github.com/your-org/config-repo
+        #  default-label: main
+        #  search-paths: '{application}'
+        #  clone-on-start: true
+        #  username: ${GIT_USERNAME:}
+        #  password: ${GIT_PASSWORD:}
+        
+        # Native (file system) backend configuration (for development)
+        # This is simpler for local development and testing
+        native:
+          # Search locations for configuration files
+          # Can use: file:// for absolute paths, classpath:/ for resources folder
+          search-locations: 
+            - classpath:/config-repo
+            - file:./config-repo
+        
+        # Use native profile (file system) for development
+        # In production, remove this and use Git backend
+        default-application-name: application
+
+  # Active profiles - determines which backend to use
+  profiles:
+    active: native  # Use 'native' for file system, remove for Git backend
+
+# Server configuration
+server:
+  # Port for Config Server
+  # 8888 is the standard port for Spring Cloud Config Server
+  port: 8888
+
+# Eureka Client configuration - Register with Service Discovery
+eureka:
+  client:
+    # Enable Eureka client to register this service
+    enabled: true
+    
+    # Eureka Server URL
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+    
+    # Fetch registry from Eureka (needed for service-to-service calls)
+    fetchRegistry: true
+    
+    # Register this instance with Eureka
+    registerWithEureka: true
+  
+  instance:
+    # Use hostname instead of IP for service identification
+    preferIpAddress: false
+    
+    # Hostname for this instance
+    hostname: localhost
+    
+    # Health check URL path
+    health-check-url-path: /actuator/health
+    
+    # Status page URL
+    status-page-url-path: /actuator/info
+
+# Encryption configuration (optional - for sensitive data)
+encrypt:
+  # Key for symmetric encryption/decryption
+  # In production, use environment variable or key store
+  # To generate: execute 'keytool -genkeypair -alias config-server-key -keyalg RSA'
+  key: ${ENCRYPT_KEY:my-secret-key-change-in-production}
+
+# Management endpoints - Actuator configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        # Expose all endpoints for monitoring
+        # Important endpoints:
+        # - /actuator/health: Health status
+        # - /actuator/env: Environment properties
+        # - /actuator/encrypt: Encrypt values
+        # - /actuator/decrypt: Decrypt values
+        include: "*"
+  
+  endpoint:
+    health:
+      # Show detailed health information
+      show-details: always
+
+# Logging configuration
+logging:
+  level:
+    # Root level
+    root: INFO
+    
+    # Config Server specific logging
+    org.springframework.cloud.config: DEBUG
+    org.springframework.web: DEBUG
+  
+  # Log pattern
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+

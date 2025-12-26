@@ -1,29 +1,109 @@
+// Root build configuration for E-commerce Microservices Platform
+// This file defines common configurations and dependencies for all sub-modules
+
+// Plugins applied to root project only (not inherited by subprojects)
 plugins {
-	id 'java'
-	id 'org.springframework.boot' version '4.0.0'
-	id 'io.spring.dependency-management' version '1.1.7'
+    id 'java'
+    id 'org.springframework.boot' version '3.2.0' apply false
+    id 'io.spring.dependency-management' version '1.1.4' apply false
 }
 
-group = 'com.example'
-version = '0.0.1-SNAPSHOT'
-description = 'Demo project for Spring Boot'
-
-java {
-	toolchain {
-		languageVersion = JavaLanguageVersion.of(25)
-	}
+// Define version constants for consistent dependency management across all modules
+ext {
+    // Spring versions
+    set('springBootVersion', '3.2.0')
+    set('springCloudVersion', '2023.0.0')
+    
+    // Resilience and fault tolerance
+    set('resilience4jVersion', '2.1.0')
+    
+    // Object mapping and code generation
+    set('mapstructVersion', '1.5.5.Final')
+    
+    // Reduce boilerplate code
+    set('lombokVersion', '1.18.30')
+    
+    // JWT token handling
+    set('jjwtVersion', '0.12.3')
+    
+    // gRPC communication
+    set('grpcVersion', '2.15.0.RELEASE')
+    
+    // Rate limiting
+    set('bucket4jVersion', '8.5.0')
+    
+    // Testing
+    set('testcontainersVersion', '1.19.3')
 }
 
-repositories {
-	mavenCentral()
+// Configuration applied to all subprojects (modules)
+subprojects {
+    // Apply plugins to all subprojects
+    apply plugin: 'java'
+    apply plugin: 'org.springframework.boot'
+    apply plugin: 'io.spring.dependency-management'
+    
+    // Group and version for all modules
+    group = 'com.ecommerce'
+    version = '1.0.0-SNAPSHOT'
+    
+    // Java version - using Java 21 LTS for Virtual Threads support
+    java {
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(21)
+        }
+    }
+    
+    // Maven Central repository for dependency resolution
+    repositories {
+        mavenCentral()
+    }
+    
+    // Spring Cloud dependency management - ensures compatible versions
+    dependencyManagement {
+        imports {
+            mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+        }
+    }
+    
+    // Dependencies common to ALL subprojects
+    dependencies {
+        // Lombok - reduces boilerplate code (getters, setters, constructors, etc.)
+        compileOnly "org.projectlombok:lombok:${lombokVersion}"
+        annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+        
+        // Spring Boot Actuator - production-ready features (health checks, metrics, etc.)
+        implementation 'org.springframework.boot:spring-boot-starter-actuator'
+        
+        // Micrometer - metrics collection for Prometheus
+        implementation 'io.micrometer:micrometer-registry-prometheus'
+        
+        // Spring Cloud Sleuth - distributed tracing with trace IDs
+        implementation 'org.springframework.cloud:spring-cloud-starter-sleuth'
+        
+        // Zipkin - distributed tracing visualization
+        implementation 'org.springframework.cloud:spring-cloud-sleuth-zipkin'
+        
+        // Validation API - for @Valid, @NotNull, etc.
+        implementation 'org.springframework.boot:spring-boot-starter-validation'
+        
+        // Testing dependencies
+        testImplementation 'org.springframework.boot:spring-boot-starter-test'
+        testImplementation "org.testcontainers:junit-jupiter:${testcontainersVersion}"
+    }
+    
+    // Test configuration - use JUnit Platform for running tests
+    tasks.named('test') {
+        useJUnitPlatform()
+    }
+    
+    // Encoding configuration
+    tasks.withType(JavaCompile) {
+        options.encoding = 'UTF-8'
+    }
 }
 
-dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-webmvc'
-	testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
-	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-}
-
-tasks.named('test') {
-	useJUnitPlatform()
+// Root project has no code, so disable bootJar task
+tasks.named('bootJar') {
+    enabled = false
 }

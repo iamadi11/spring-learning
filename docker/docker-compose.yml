@@ -1,0 +1,235 @@
+# Docker Compose Configuration for E-commerce Microservices Platform
+# This file defines all infrastructure services needed for local development
+
+# Docker Compose version
+version: '3.8'
+
+# Define all services (containers)
+services:
+  
+  # ==================== DATABASES ====================
+  
+  # PostgreSQL - Relational database for transactional data
+  # Used by: Auth Service, User Service, Order Service, Payment Service
+  postgres:
+    image: postgres:15-alpine  # Lightweight Alpine Linux version
+    container_name: ecommerce-postgres
+    environment:
+      # Root password for PostgreSQL
+      POSTGRES_PASSWORD: postgres
+      # Create multiple databases on startup
+      POSTGRES_MULTIPLE_DATABASES: auth_db,user_db,order_db,payment_db
+    ports:
+      # Map container port 5432 to host port 5432
+      - "5432:5432"
+    volumes:
+      # Persist data even after container restart
+      - postgres-data:/var/lib/postgresql/data
+      # Init script to create multiple databases
+      - ./init-scripts/init-postgres.sh:/docker-entrypoint-initdb.d/init-postgres.sh
+    networks:
+      - ecommerce-network
+    healthcheck:
+      # Check if PostgreSQL is ready to accept connections
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  
+  # MongoDB - Document database for flexible schema data
+  # Used by: Product Service, Review Service, Notification Service
+  mongodb:
+    image: mongo:6
+    container_name: ecommerce-mongodb
+    environment:
+      # Root username and password
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin123
+    ports:
+      # Map MongoDB port
+      - "27017:27017"
+    volumes:
+      # Persist MongoDB data
+      - mongodb-data:/data/db
+    networks:
+      - ecommerce-network
+    healthcheck:
+      # Check if MongoDB is ready
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  
+  # Redis - In-memory cache and session store
+  # Used by: All services for caching and rate limiting
+  redis:
+    image: redis:7-alpine
+    container_name: ecommerce-redis
+    ports:
+      # Map Redis port
+      - "6379:6379"
+    volumes:
+      # Persist Redis data
+      - redis-data:/data
+    networks:
+      - ecommerce-network
+    healthcheck:
+      # Check if Redis is responding
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  
+  # ==================== MESSAGE QUEUE ====================
+  
+  # Zookeeper - Required for Kafka (manages cluster metadata)
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    container_name: ecommerce-zookeeper
+    environment:
+      # Zookeeper client port
+      ZOOKEEPER_CLIENT_PORT: 2181
+      # Zookeeper tick time (milliseconds)
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+    networks:
+      - ecommerce-network
+  
+  # Apache Kafka - Event streaming platform for asynchronous communication
+  # Used by: All services for event-driven architecture
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    container_name: ecommerce-kafka
+    depends_on:
+      - zookeeper
+    ports:
+      # Kafka port for external connections
+      - "9092:9092"
+      # Kafka port for internal connections
+      - "29092:29092"
+    environment:
+      # Kafka broker ID
+      KAFKA_BROKER_ID: 1
+      # Zookeeper connection string
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      # Advertised listeners (how clients connect)
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      # Listener security protocol map
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      # Inter-broker listener
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      # Offsets topic replication factor
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      # Auto-create topics when publishing
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
+    networks:
+      - ecommerce-network
+    healthcheck:
+      # Check if Kafka is ready
+      test: kafka-topics --bootstrap-server kafka:29092 --list
+      interval: 30s
+      timeout: 10s
+      retries: 5
+  
+  # Kafka UI - Web interface for managing Kafka
+  # Access at: http://localhost:8090
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: ecommerce-kafka-ui
+    depends_on:
+      - kafka
+    ports:
+      - "8090:8080"
+    environment:
+      # Kafka cluster configuration
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
+      KAFKA_CLUSTERS_0_ZOOKEEPER: zookeeper:2181
+    networks:
+      - ecommerce-network
+  
+  # ==================== OBSERVABILITY ====================
+  
+  # Zipkin - Distributed tracing system
+  # Collects timing data for troubleshooting latency problems
+  # Access at: http://localhost:9411
+  zipkin:
+    image: openzipkin/zipkin:latest
+    container_name: ecommerce-zipkin
+    ports:
+      # Zipkin UI port
+      - "9411:9411"
+    environment:
+      # Storage type (in-memory for development)
+      STORAGE_TYPE: mem
+    networks:
+      - ecommerce-network
+  
+  # Prometheus - Metrics collection and monitoring
+  # Scrapes metrics from all services via /actuator/prometheus
+  # Access at: http://localhost:9090
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: ecommerce-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      # Prometheus configuration file
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      # Persist Prometheus data
+      - prometheus-data:/prometheus
+    command:
+      # Use custom config file
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      # Enable admin API
+      - '--web.enable-admin-api'
+    networks:
+      - ecommerce-network
+  
+  # Grafana - Metrics visualization and dashboards
+  # Connects to Prometheus for data source
+  # Access at: http://localhost:3000 (admin/admin)
+  grafana:
+    image: grafana/grafana:latest
+    container_name: ecommerce-grafana
+    depends_on:
+      - prometheus
+    ports:
+      - "3000:3000"
+    environment:
+      # Default admin credentials
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      # Prometheus data source
+      GF_INSTALL_PLUGINS: grafana-piechart-panel
+    volumes:
+      # Persist Grafana data
+      - grafana-data:/var/lib/grafana
+      # Grafana provisioning (datasources, dashboards)
+      - ./grafana/provisioning:/etc/grafana/provisioning
+    networks:
+      - ecommerce-network
+
+# Define named volumes for data persistence
+# Data persists even after containers are stopped/removed
+volumes:
+  postgres-data:
+    driver: local
+  mongodb-data:
+    driver: local
+  redis-data:
+    driver: local
+  prometheus-data:
+    driver: local
+  grafana-data:
+    driver: local
+
+# Define custom network for inter-container communication
+# All services can communicate using service names as hostnames
+networks:
+  ecommerce-network:
+    driver: bridge
+    # Enable DNS resolution between containers
+    name: ecommerce-network
+

@@ -1,1 +1,20 @@
-rootProject.name = 'rest-service'
+// Root project name - E-commerce Microservices Platform
+rootProject.name = 'ecommerce-microservices'
+
+// Infrastructure Services - Core microservices infrastructure components
+include 'infrastructure:api-gateway'           // API Gateway - Single entry point for all client requests
+include 'infrastructure:service-discovery'     // Eureka Server - Service registration and discovery
+include 'infrastructure:config-server'         // Config Server - Centralized configuration management
+
+// Business Services - Core e-commerce business logic services
+include 'services:auth-service'                // Authentication & Authorization - OAuth2, JWT, Social Login
+include 'services:user-service'                // User Management - CQRS pattern implementation
+include 'services:product-service'             // Product Catalog - Event Sourcing with MongoDB
+include 'services:order-service'               // Order Management - Saga pattern for distributed transactions
+include 'services:payment-service'             // Payment Processing - Circuit Breaker and resilience patterns
+include 'services:notification-service'        // Notifications - Multithreading, WebSocket, async processing
+include 'services:review-service'              // Reviews & Ratings - gRPC communication
+
+// Shared Libraries - Common code shared across all services
+include 'shared:common-lib'                    // Common utilities, DTOs, exceptions
+include 'shared:event-lib'                     // Event definitions for Kafka messaging

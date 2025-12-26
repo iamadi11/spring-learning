@@ -1,0 +1,19 @@
+// Build configuration for Event Library
+// Shared event definitions for Kafka messaging across services
+
+dependencies {
+    // Jackson for JSON serialization of events
+    implementation 'com.fasterxml.jackson.core:jackson-databind'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'  // Java 8 date/time support
+}
+
+// This is a library, not a bootable application
+bootJar {
+    enabled = false
+}
+
+// Enable plain JAR creation
+jar {
+    enabled = true
+}
+

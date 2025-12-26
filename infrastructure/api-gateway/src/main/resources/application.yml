@@ -1,0 +1,272 @@
+# API Gateway Configuration
+# This file configures routing, security, rate limiting, and resilience patterns
+
+# Spring Boot application configuration
+spring:
+  application:
+    # Application name - used for service discovery
+    name: api-gateway
+  
+  # Spring Cloud Gateway configuration - defines how requests are routed
+  cloud:
+    gateway:
+      # Route definitions - each route specifies how to forward requests
+      routes:
+        # Auth Service Routes - Handle authentication and authorization
+        - id: auth-service                    # Unique identifier for this route
+          uri: lb://auth-service              # lb:// means load-balanced via Eureka discovery
+          predicates:                         # Conditions that must match for this route
+            - Path=/api/auth/**               # Match all paths starting with /api/auth/
+          filters:                            # Transformations applied to request/response
+            - StripPrefix=1                   # Remove /api from path before forwarding
+            - name: CircuitBreaker            # Enable circuit breaker pattern
+              args:
+                name: authServiceCircuitBreaker
+                fallbackUri: forward:/fallback/auth
+        
+        # User Service Routes - User management and profiles
+        - id: user-service
+          uri: lb://user-service              # Load-balanced to user-service instances
+          predicates:
+            - Path=/api/users/**
+          filters:
+            - StripPrefix=1
+            - name: CircuitBreaker
+              args:
+                name: userServiceCircuitBreaker
+                fallbackUri: forward:/fallback/users
+        
+        # Product Service Routes - Product catalog and inventory
+        - id: product-service
+          uri: lb://product-service
+          predicates:
+            - Path=/api/products/**
+          filters:
+            - StripPrefix=1
+            - name: CircuitBreaker
+              args:
+                name: productServiceCircuitBreaker
+                fallbackUri: forward:/fallback/products
+        
+        # Order Service Routes - Order management
+        - id: order-service
+          uri: lb://order-service
+          predicates:
+            - Path=/api/orders/**
+          filters:
+            - StripPrefix=1
+            - name: CircuitBreaker
+              args:
+                name: orderServiceCircuitBreaker
+                fallbackUri: forward:/fallback/orders
+        
+        # Payment Service Routes - Payment processing
+        - id: payment-service
+          uri: lb://payment-service
+          predicates:
+            - Path=/api/payments/**
+          filters:
+            - StripPrefix=1
+            - name: CircuitBreaker
+              args:
+                name: paymentServiceCircuitBreaker
+                fallbackUri: forward:/fallback/payments
+        
+        # Review Service Routes - Reviews and ratings
+        - id: review-service
+          uri: lb://review-service
+          predicates:
+            - Path=/api/reviews/**
+          filters:
+            - StripPrefix=1
+            - name: CircuitBreaker
+              args:
+                name: reviewServiceCircuitBreaker
+                fallbackUri: forward:/fallback/reviews
+        
+        # Notification Service Routes - WebSocket and notifications
+        - id: notification-service
+          uri: lb://notification-service
+          predicates:
+            - Path=/api/notifications/**
+          filters:
+            - StripPrefix=1
+      
+      # Global CORS configuration - Allow cross-origin requests
+      globalcors:
+        cors-configurations:
+          '[/**]':                            # Apply to all paths
+            allowedOrigins: "*"               # Allow all origins (restrict in production)
+            allowedMethods:                   # Allowed HTTP methods
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+              - PATCH
+            allowedHeaders: "*"               # Allow all headers
+            exposedHeaders:                   # Headers exposed to client
+              - Authorization
+              - Content-Type
+            allowCredentials: true            # Allow cookies/credentials
+            maxAge: 3600                      # Cache preflight response for 1 hour
+      
+      # Default filters applied to all routes
+      default-filters:
+        - name: Retry                         # Retry failed requests
+          args:
+            retries: 3                        # Maximum 3 retry attempts
+            statuses: BAD_GATEWAY,SERVICE_UNAVAILABLE  # Retry on these HTTP statuses
+            methods: GET,POST                 # Only retry idempotent methods
+            backoff:
+              firstBackoff: 100ms             # First retry after 100ms
+              maxBackoff: 500ms               # Maximum backoff time
+              factor: 2                       # Exponential backoff factor
+        - AddRequestHeader=X-Request-Gateway, API-Gateway  # Add custom header
+        - AddResponseHeader=X-Response-Gateway, API-Gateway
+
+# Server configuration
+server:
+  # Port for API Gateway - single entry point for all clients
+  port: 8080
+  
+  # Netty server configuration (Spring WebFlux uses Netty)
+  netty:
+    # Connection timeout
+    connection-timeout: 2s
+
+# Eureka Client configuration
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+    fetchRegistry: true                      # Fetch service registry for routing
+    registerWithEureka: true                 # Register gateway with Eureka
+  instance:
+    preferIpAddress: true
+    hostname: localhost
+
+# Resilience4j Circuit Breaker configuration
+resilience4j:
+  circuitbreaker:
+    instances:
+      # Circuit breaker for Auth Service
+      authServiceCircuitBreaker:
+        # Failure rate threshold to open circuit (percentage)
+        # If 50% or more requests fail, circuit opens
+        failureRateThreshold: 50
+        
+        # Minimum number of calls before calculating failure rate
+        # Need at least 10 calls to determine if service is failing
+        minimumNumberOfCalls: 10
+        
+        # Number of permitted calls in half-open state
+        # After circuit opens, try 3 calls to test if service recovered
+        permittedNumberOfCallsInHalfOpenState: 3
+        
+        # Wait duration in open state before trying half-open
+        # Wait 30 seconds before testing if service recovered
+        waitDurationInOpenState: 30s
+        
+        # Sliding window size for tracking calls
+        # Look at last 10 calls to calculate failure rate
+        slidingWindowSize: 10
+        
+        # Sliding window type: COUNT_BASED or TIME_BASED
+        slidingWindowType: COUNT_BASED
+      
+      # Similar configuration for other services
+      userServiceCircuitBreaker:
+        failureRateThreshold: 50
+        minimumNumberOfCalls: 10
+        permittedNumberOfCallsInHalfOpenState: 3
+        waitDurationInOpenState: 30s
+        slidingWindowSize: 10
+      
+      productServiceCircuitBreaker:
+        failureRateThreshold: 50
+        minimumNumberOfCalls: 10
+        permittedNumberOfCallsInHalfOpenState: 3
+        waitDurationInOpenState: 30s
+        slidingWindowSize: 10
+      
+      orderServiceCircuitBreaker:
+        failureRateThreshold: 50
+        minimumNumberOfCalls: 10
+        permittedNumberOfCallsInHalfOpenState: 3
+        waitDurationInOpenState: 30s
+        slidingWindowSize: 10
+      
+      paymentServiceCircuitBreaker:
+        failureRateThreshold: 50
+        minimumNumberOfCalls: 10
+        permittedNumberOfCallsInHalfOpenState: 3
+        waitDurationInOpenState: 30s
+        slidingWindowSize: 10
+      
+      reviewServiceCircuitBreaker:
+        failureRateThreshold: 50
+        minimumNumberOfCalls: 10
+        permittedNumberOfCallsInHalfOpenState: 3
+        waitDurationInOpenState: 30s
+        slidingWindowSize: 10
+
+# Redis configuration for distributed rate limiting
+spring.redis:
+  host: localhost
+  port: 6379
+  timeout: 2000ms
+
+# JWT configuration for token validation
+jwt:
+  # Secret key for JWT signature validation
+  # In production, use environment variable or secure vault
+  secret: ${JWT_SECRET:your-super-secret-jwt-key-change-in-production-min-256-bits}
+  
+  # Token expiration time (not validated in gateway, just passed through)
+  expiration: 86400000  # 24 hours in milliseconds
+
+# Rate Limiting configuration
+rate-limit:
+  # Enable rate limiting
+  enabled: true
+  
+  # Default rate limit for all APIs
+  # 100 requests per minute per user
+  default-limit: 100
+  default-duration: 60  # seconds
+  
+  # Specific rate limits for different endpoints
+  endpoints:
+    - path: /api/auth/login
+      limit: 5            # Only 5 login attempts per minute
+      duration: 60
+    - path: /api/auth/register
+      limit: 3            # Only 3 registrations per minute
+      duration: 60
+    - path: /api/orders/**
+      limit: 20           # 20 order operations per minute
+      duration: 60
+
+# Management endpoints - Actuator
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+    gateway:
+      enabled: true       # Enable gateway-specific endpoints
+
+# Logging configuration
+logging:
+  level:
+    root: INFO
+    org.springframework.cloud.gateway: DEBUG
+    org.springframework.web: DEBUG
+    reactor.netty: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%X{traceId:-}] - %msg%n"
+

@@ -1,0 +1,21 @@
+// Build configuration for Common Library
+// Shared utilities, DTOs, and exceptions used across all services
+
+dependencies {
+    // Spring Web for REST support
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    
+    // Jackson for JSON processing
+    implementation 'com.fasterxml.jackson.core:jackson-databind'
+}
+
+// This is a library, not a bootable application
+bootJar {
+    enabled = false
+}
+
+// Enable plain JAR creation
+jar {
+    enabled = true
+}
+

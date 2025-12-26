@@ -1,0 +1,39 @@
+// Build configuration for API Gateway
+// Single entry point for all client requests with routing, security, and resilience
+
+dependencies {
+    // Spring Cloud Gateway - Reactive API Gateway
+    // Provides routing, filtering, rate limiting, and circuit breaking
+    implementation 'org.springframework.cloud:spring-cloud-starter-gateway'
+    
+    // Eureka Client - Service Discovery integration
+    // Allows gateway to discover service instances dynamically
+    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+    
+    // Config Client - Fetch configuration from Config Server
+    implementation 'org.springframework.cloud:spring-cloud-starter-config'
+    
+    // Redis Reactive - For distributed rate limiting
+    // Reactive support is required for Spring Cloud Gateway
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis-reactive'
+    
+    // Resilience4j - Circuit breaker and resilience patterns
+    // Integrates with Gateway for fault tolerance
+    implementation "io.github.resilience4j:resilience4j-spring-boot3:${resilience4jVersion}"
+    implementation "io.github.resilience4j:resilience4j-reactor:${resilience4jVersion}"
+    implementation "io.github.resilience4j:resilience4j-circuitbreaker:${resilience4jVersion}"
+    
+    // Rate Limiting - Token bucket algorithm
+    implementation "com.github.vladimir-bukhtoyarov:bucket4j-core:${bucket4jVersion}"
+    
+    // JWT Support - For token validation
+    implementation "io.jsonwebtoken:jjwt-api:${jjwtVersion}"
+    runtimeOnly "io.jsonwebtoken:jjwt-impl:${jjwtVersion}"
+    runtimeOnly "io.jsonwebtoken:jjwt-jackson:${jjwtVersion}"
+}
+
+// Enable bootJar to create executable JAR
+bootJar {
+    enabled = true
+}
+

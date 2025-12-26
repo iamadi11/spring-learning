@@ -1,0 +1,152 @@
+# Auth Service Configuration
+# Comprehensive authentication and authorization service
+
+spring:
+  application:
+    name: auth-service
+  
+  # Database configuration - PostgreSQL
+  datasource:
+    url: jdbc:postgresql://localhost:5432/auth_db
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      connection-timeout: 30000
+  
+  # JPA configuration
+  jpa:
+    hibernate:
+      ddl-auto: validate  # Use Flyway for schema management
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+  
+  # Flyway - Database migration
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    locations: classpath:db/migration
+  
+  # Redis configuration - for sessions and rate limiting
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      timeout: 2000ms
+  
+  # Mail configuration - for email verification and password reset
+  mail:
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+  
+  # OAuth2 Client configuration - for social login
+  security:
+    oauth2:
+      client:
+        registration:
+          # Google OAuth2
+          google:
+            client-id: ${GOOGLE_CLIENT_ID:your-google-client-id}
+            client-secret: ${GOOGLE_CLIENT_SECRET:your-google-client-secret}
+            scope:
+              - email
+              - profile
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+          
+          # GitHub OAuth2
+          github:
+            client-id: ${GITHUB_CLIENT_ID:your-github-client-id}
+            client-secret: ${GITHUB_CLIENT_SECRET:your-github-client-secret}
+            scope:
+              - user:email
+              - read:user
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+          
+          # Facebook OAuth2
+          facebook:
+            client-id: ${FACEBOOK_CLIENT_ID:your-facebook-client-id}
+            client-secret: ${FACEBOOK_CLIENT_SECRET:your-facebook-client-secret}
+            scope:
+              - email
+              - public_profile
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+
+# Server configuration
+server:
+  port: 9001
+  error:
+    include-message: always
+    include-binding-errors: always
+
+# Eureka Client configuration
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+    fetchRegistry: true
+    registerWithEureka: true
+  instance:
+    preferIpAddress: true
+    hostname: localhost
+
+# JWT configuration
+jwt:
+  secret: ${JWT_SECRET:your-super-secret-jwt-signing-key-min-256-bits-for-hs256}
+  access-token-expiration: ${JWT_ACCESS_TOKEN_EXPIRATION:900000}  # 15 minutes
+  refresh-token-expiration: ${JWT_REFRESH_TOKEN_EXPIRATION:604800000}  # 7 days
+  issuer: ecommerce-auth-service
+
+# Two-Factor Authentication configuration
+twofa:
+  issuer: E-commerce Platform
+  time-step-seconds: 30
+  window-size: 3
+
+# Rate Limiting configuration
+rate-limit:
+  login:
+    max-attempts: 5
+    duration-minutes: 15
+  registration:
+    max-attempts: 3
+    duration-minutes: 60
+  password-reset:
+    max-attempts: 3
+    duration-minutes: 60
+
+# Management endpoints
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    tags:
+      application: ${spring.application.name}
+
+# Logging configuration
+logging:
+  level:
+    root: INFO
+    com.ecommerce.auth: DEBUG
+    org.springframework.security: DEBUG
+    org.springframework.security.oauth2: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%X{traceId:-}] - %msg%n"
+

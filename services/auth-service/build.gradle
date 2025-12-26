@@ -1,0 +1,73 @@
+// Build configuration for Auth Service
+// Comprehensive authentication and authorization service with OAuth2, JWT, Social Login, 2FA
+
+dependencies {
+    // Spring Boot Starters
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+    
+    // OAuth2 Authorization Server - provides OAuth2 endpoints
+    // Generates and validates access tokens, refresh tokens, authorization codes
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-authorization-server'
+    
+    // OAuth2 Client - for social login (Google, GitHub, Facebook)
+    // Handles OAuth2 flows with external providers
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+    
+    // OAuth2 Resource Server - for validating JWT tokens
+    // Allows this service to validate tokens it issues
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
+    
+    // Eureka Client - Service Discovery registration
+    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+    
+    // Config Client - Fetch configuration from Config Server
+    implementation 'org.springframework.cloud:spring-cloud-starter-config'
+    
+    // PostgreSQL Driver - Database for users, roles, tokens
+    runtimeOnly 'org.postgresql:postgresql'
+    
+    // Flyway - Database migration tool
+    // Manages database schema versions and updates
+    implementation 'org.flywaydb:flyway-core'
+    
+    // JWT Support - JSON Web Token generation and validation
+    // Used for creating access tokens and refresh tokens
+    implementation "io.jsonwebtoken:jjwt-api:${jjwtVersion}"
+    runtimeOnly "io.jsonwebtoken:jjwt-impl:${jjwtVersion}"
+    runtimeOnly "io.jsonwebtoken:jjwt-jackson:${jjwtVersion}"
+    
+    // MapStruct - DTO to Entity mapping
+    // Reduces boilerplate code for object transformations
+    implementation "org.mapstruct:mapstruct:${mapstructVersion}"
+    annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
+    
+    // Redis - For session storage and rate limiting
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    
+    // Google Authenticator - For TOTP-based 2FA
+    // Generates and validates time-based one-time passwords
+    implementation 'com.warrenstrange:googleauth:1.5.0'
+    
+    // QR Code Generation - For 2FA setup
+    // Generates QR codes for Google Authenticator setup
+    implementation 'com.google.zxing:core:3.5.1'
+    implementation 'com.google.zxing:javase:3.5.1'
+    
+    // Shared libraries
+    implementation project(':shared:common-lib')
+    implementation project(':shared:event-lib')
+    
+    // Testing
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+    testImplementation "org.testcontainers:postgresql:${testcontainersVersion}"
+}
+
+// Enable bootJar to create executable JAR
+bootJar {
+    enabled = true
+}
+

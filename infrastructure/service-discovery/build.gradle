@@ -1,0 +1,15 @@
+// Build configuration for Service Discovery (Eureka Server)
+// This module provides service registration and discovery capabilities for all microservices
+
+dependencies {
+    // Spring Cloud Netflix Eureka Server - Service Discovery implementation
+    // Provides REST-based service registry for resilient load balancing and failover
+    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-server'
+}
+
+// Eureka Server is a standalone service, not a bootable JAR with embedded services
+// Enable bootJar to create executable JAR
+bootJar {
+    enabled = true
+}
+

@@ -1,0 +1,89 @@
+# Eureka Server Configuration
+# This file configures the Service Discovery server behavior and settings
+
+# Spring Boot application configuration
+spring:
+  application:
+    # Application name - used for identification in logs and monitoring
+    name: service-discovery
+
+# Server configuration - defines the HTTP server settings
+server:
+  # Port on which Eureka Server will run
+  # 8761 is the conventional port for Eureka Server
+  port: 8761
+
+# Eureka Server specific configuration
+eureka:
+  # Client configuration - even though this is a server, it has client capabilities
+  client:
+    # registerWithEureka: Should this Eureka Server register itself with another Eureka Server?
+    # false: In standalone mode, server doesn't register with itself
+    # true: In clustered mode (multiple Eureka servers), they register with each other
+    registerWithEureka: false
+    
+    # fetchRegistry: Should this server fetch registry information from other Eureka servers?
+    # false: This is the registry source, no need to fetch from elsewhere
+    # true: In clustered mode, servers sync registry data between each other
+    fetchRegistry: false
+    
+    # Service URL where Eureka clients will register
+    # This is the URL that all microservices will use to register themselves
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+  
+  # Server configuration - controls Eureka Server behavior
+  server:
+    # Enable self-preservation mode
+    # Self-preservation mode prevents Eureka from removing services during network issues
+    # When enabled, Eureka won't evict instances if renewal (heartbeat) rate drops below threshold
+    # This prevents mass eviction during network partitions
+    # In production: true (prevents cascading failures)
+    # In development: false (faster to remove dead instances for testing)
+    enableSelfPreservation: false
+    
+    # Interval to check for expired leases (in milliseconds)
+    # Default: 60000ms (60 seconds)
+    # Eureka checks every 60 seconds for services that haven't sent heartbeats
+    evictionIntervalTimerInMs: 60000
+    
+    # Response cache update interval (in milliseconds)
+    # Eureka caches the registry information for performance
+    # This defines how often the cache is updated
+    # Lower value = more up-to-date information but higher server load
+    responseCacheUpdateIntervalMs: 3000
+
+# Logging configuration - control log output levels
+logging:
+  level:
+    # Root level - applies to all packages by default
+    root: INFO
+    
+    # Eureka specific logging
+    com.netflix.eureka: DEBUG        # Eureka server internal operations
+    com.netflix.discovery: DEBUG      # Service discovery operations
+    
+  # Log pattern - format of log messages
+  pattern:
+    # Include: timestamp, log level, thread name, logger name, message, trace ID (for distributed tracing)
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+
+# Management endpoints - Spring Boot Actuator configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        # Expose all actuator endpoints for monitoring
+        # Available at: http://localhost:8761/actuator/{endpoint}
+        # Important endpoints:
+        # - /health: Server health status
+        # - /metrics: Server metrics (CPU, memory, etc.)
+        # - /info: Application information
+        include: "*"
+  
+  endpoint:
+    health:
+      # Show detailed health information
+      # Details include: disk space, Eureka server status, etc.
+      show-details: always
+

@@ -1,0 +1,58 @@
+# Common Configuration for All Services
+# This configuration is shared across all microservices
+
+# Spring configuration common to all services
+spring:
+  # JPA configuration (for services using PostgreSQL)
+  jpa:
+    # Show SQL queries in logs (useful for debugging)
+    show-sql: true
+    properties:
+      hibernate:
+        # Format SQL for better readability
+        format_sql: true
+        # Use new ID generator mappings
+        id:
+          new_generator_mappings: true
+  
+  # Jackson JSON configuration
+  jackson:
+    # Serialize dates as timestamps
+    serialization:
+      write-dates-as-timestamps: false
+    # Handle unknown properties
+    deserialization:
+      fail-on-unknown-properties: false
+
+# Eureka Client configuration (common for all services)
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+    fetchRegistry: true
+    registerWithEureka: true
+  instance:
+    preferIpAddress: true
+    lease-renewal-interval-in-seconds: 30
+    lease-expiration-duration-in-seconds: 90
+
+# Actuator configuration (common for all services)
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: when-authorized
+  metrics:
+    tags:
+      application: ${spring.application.name}
+
+# Logging configuration
+logging:
+  level:
+    root: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
