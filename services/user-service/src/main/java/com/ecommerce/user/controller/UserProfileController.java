@@ -181,9 +181,8 @@ public class UserProfileController {
         
         // Build API response
         ApiResponse<UserProfileResponse> apiResponse = ApiResponse.success(
-            response,
             "Profile retrieved successfully",
-            httpRequest.getRequestURI()
+            response
         );
         
         return ResponseEntity.ok(apiResponse);
@@ -221,9 +220,8 @@ public class UserProfileController {
         
         // Build API response
         ApiResponse<UserProfileResponse> apiResponse = ApiResponse.success(
-            response,
             "Profile updated successfully",
-            httpRequest.getRequestURI()
+            response
         );
         
         return ResponseEntity.ok(apiResponse);
@@ -254,9 +252,7 @@ public class UserProfileController {
         commandService.updateBio(userId, bio);
         
         ApiResponse<Void> apiResponse = ApiResponse.success(
-            null,
-            "Bio updated successfully",
-            httpRequest.getRequestURI()
+            "Bio updated successfully"
         );
         
         return ResponseEntity.ok(apiResponse);
@@ -286,9 +282,7 @@ public class UserProfileController {
         commandService.updateAvatarUrl(userId, avatarUrl);
         
         ApiResponse<Void> apiResponse = ApiResponse.success(
-            null,
-            "Avatar updated successfully",
-            httpRequest.getRequestURI()
+            "Avatar updated successfully"
         );
         
         return ResponseEntity.ok(apiResponse);
@@ -318,9 +312,7 @@ public class UserProfileController {
         commandService.deleteProfile(userId);
         
         ApiResponse<Void> apiResponse = ApiResponse.success(
-            null,
-            "Profile deleted successfully",
-            httpRequest.getRequestURI()
+            "Profile deleted successfully"
         );
         
         return ResponseEntity.ok(apiResponse);

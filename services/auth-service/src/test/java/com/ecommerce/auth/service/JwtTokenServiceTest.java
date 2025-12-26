@@ -90,7 +90,7 @@ class JwtTokenServiceTest {
         
         // Create test user with roles
         Role userRole = Role.builder()
-                .id(1L)
+                .id("role-uuid-1")
                 .name("USER")
                 .build();
         

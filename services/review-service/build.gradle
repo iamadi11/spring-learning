@@ -39,6 +39,9 @@ dependencies {
     implementation "com.google.protobuf:protobuf-java:${protobufVersion}"
     implementation "com.google.protobuf:protobuf-java-util:${protobufVersion}"
     
+    // javax.annotation for Generated annotation (Java 9+)
+    implementation 'javax.annotation:javax.annotation-api:1.3.2'
+    
     // Swagger/OpenAPI - API Documentation
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
     

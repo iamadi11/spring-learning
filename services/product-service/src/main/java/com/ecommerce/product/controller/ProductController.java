@@ -71,9 +71,8 @@ public class ProductController {
         ProductResponse response = toResponse(created);
         
         ApiResponse<ProductResponse> apiResponse = ApiResponse.success(
-            response,
             "Product created successfully",
-            httpRequest.getRequestURI()
+            response
         );
         
         return ResponseEntity.status(HttpStatus.CREATED).body(apiResponse);
@@ -96,9 +95,8 @@ public class ProductController {
         ProductResponse response = toResponse(product);
         
         ApiResponse<ProductResponse> apiResponse = ApiResponse.success(
-            response,
             "Product retrieved successfully",
-            httpRequest.getRequestURI()
+            response
         );
         
         return ResponseEntity.ok(apiResponse);
@@ -123,9 +121,8 @@ public class ProductController {
         ProductResponse response = toResponse(updated);
         
         ApiResponse<ProductResponse> apiResponse = ApiResponse.success(
-            response,
             "Product updated successfully",
-            httpRequest.getRequestURI()
+            response
         );
         
         return ResponseEntity.ok(apiResponse);
@@ -150,9 +147,8 @@ public class ProductController {
         ProductResponse response = toResponse(updated);
         
         ApiResponse<ProductResponse> apiResponse = ApiResponse.success(
-            response,
             "Price updated successfully",
-            httpRequest.getRequestURI()
+            response
         );
         
         return ResponseEntity.ok(apiResponse);
@@ -177,9 +173,8 @@ public class ProductController {
         ProductResponse response = toResponse(updated);
         
         ApiResponse<ProductResponse> apiResponse = ApiResponse.success(
-            response,
             "Stock updated successfully",
-            httpRequest.getRequestURI()
+            response
         );
         
         return ResponseEntity.ok(apiResponse);
@@ -202,9 +197,7 @@ public class ProductController {
         commandService.deleteProduct(id, reason, userId);
         
         ApiResponse<Void> apiResponse = ApiResponse.success(
-            null,
-            "Product deleted successfully",
-            httpRequest.getRequestURI()
+            "Product deleted successfully"
         );
         
         return ResponseEntity.ok(apiResponse);
@@ -280,9 +273,8 @@ public class ProductController {
         List<BaseEvent> events = queryService.getProductHistory(id);
         
         ApiResponse<List<BaseEvent>> apiResponse = ApiResponse.success(
-            events,
             "Event history retrieved successfully",
-            httpRequest.getRequestURI()
+            events
         );
         
         return ResponseEntity.ok(apiResponse);
@@ -303,9 +295,8 @@ public class ProductController {
         ProductResponse response = toResponse(rebuilt);
         
         ApiResponse<ProductResponse> apiResponse = ApiResponse.success(
-            response,
             "Product rebuilt from events successfully",
-            httpRequest.getRequestURI()
+            response
         );
         
         return ResponseEntity.ok(apiResponse);

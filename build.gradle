@@ -126,3 +126,13 @@ tasks.named('jar') {
 afterEvaluate {
     tasks.findByName('bootJar')?.enabled = false
 }
+
+// Disable bootJar for parent modules (infrastructure, services, shared)
+configure(subprojects.findAll { it.name in ['infrastructure', 'services', 'shared'] }) {
+    bootJar {
+        enabled = false
+    }
+    jar {
+        enabled = false
+    }
+}

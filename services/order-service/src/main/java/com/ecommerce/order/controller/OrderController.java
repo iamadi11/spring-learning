@@ -60,9 +60,8 @@ public class OrderController {
         OrderResponse response = toResponse(order);
 
         ApiResponse<OrderResponse> apiResponse = ApiResponse.success(
-            response,
             "Order created successfully",
-            httpRequest.getRequestURI()
+            response
         );
 
         return ResponseEntity.status(HttpStatus.CREATED).body(apiResponse);
@@ -83,9 +82,8 @@ public class OrderController {
         OrderResponse response = toResponse(order);
 
         ApiResponse<OrderResponse> apiResponse = ApiResponse.success(
-            response,
             "Order retrieved successfully",
-            httpRequest.getRequestURI()
+            response
         );
 
         return ResponseEntity.ok(apiResponse);
@@ -128,9 +126,8 @@ public class OrderController {
         OrderResponse response = toResponse(order);
 
         ApiResponse<OrderResponse> apiResponse = ApiResponse.success(
-            response,
             "Order cancelled successfully",
-            httpRequest.getRequestURI()
+            response
         );
 
         return ResponseEntity.ok(apiResponse);
