@@ -107,7 +107,22 @@ subprojects {
     }
 }
 
-// Root project has no code, so disable bootJar task if it exists
+// Root project has no code, so disable build tasks
+// This ensures the root project doesn't try to compile anything
+java {
+    // Disable source sets for root project
+    sourceSets.all { it.java.setSrcDirs([]) }
+}
+
+// Disable various tasks for root project
+tasks.withType(JavaCompile).configureEach {
+    enabled = false
+}
+
+tasks.named('jar') {
+    enabled = false
+}
+
 afterEvaluate {
     tasks.findByName('bootJar')?.enabled = false
 }
