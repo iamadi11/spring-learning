@@ -4,30 +4,186 @@ A comprehensive, production-grade e-commerce platform built with **Spring Boot m
 
 **✅ 100% COMPLETE** - All 13 phases implemented with full deployment infrastructure and comprehensive documentation!
 
+## ✨ Features Implemented
+
+### 🎯 Core Microservices (10 Services)
+✅ API Gateway with rate limiting & circuit breaker  
+✅ Service Discovery (Netflix Eureka)  
+✅ Centralized Configuration Server  
+✅ Authentication Service (OAuth2, JWT, Social Login, 2FA)  
+✅ User Service (CQRS pattern)  
+✅ Product Service (Event Sourcing)  
+✅ Order Service (Saga pattern)  
+✅ Payment Service (Resilience patterns)  
+✅ Notification Service (Multithreading, WebSocket)  
+✅ Review Service (gRPC communication)  
+
+### 🔐 Authentication & Security
+✅ OAuth2 Authorization Server (All grant types)  
+✅ JWT Access & Refresh Tokens  
+✅ Social Login (Google, GitHub, Facebook)  
+✅ Two-Factor Authentication (TOTP, SMS, Email)  
+✅ API Key Management  
+✅ Multi-Tenancy Support  
+✅ Role-Based Access Control (RBAC)  
+✅ BCrypt Password Hashing  
+
+### 🏗️ System Design Patterns
+✅ CQRS (Command Query Responsibility Segregation)  
+✅ Event Sourcing  
+✅ Saga Pattern for distributed transactions  
+✅ Circuit Breaker, Retry, Bulkhead  
+✅ Outbox Pattern  
+✅ Cache-Aside, Write-Through caching  
+✅ Database Replication & Sharding  
+✅ API Gateway pattern  
+✅ Service Discovery pattern  
+
+### 📊 Databases & Caching
+✅ PostgreSQL with Primary-Replica replication  
+✅ MongoDB with Sharding by category  
+✅ Redis for distributed caching  
+✅ Database per Service pattern  
+✅ Flyway/Liquibase migrations  
+
+### 📨 Messaging & Communication
+✅ Apache Kafka event streaming  
+✅ gRPC for high-performance RPC  
+✅ WebSocket for real-time notifications  
+✅ REST APIs (80+ endpoints)  
+✅ Dead Letter Queue for failed messages  
+
+### 🔍 Monitoring & Observability
+✅ Prometheus metrics collection  
+✅ Grafana dashboards  
+✅ Zipkin distributed tracing  
+✅ ELK Stack (Elasticsearch, Logstash, Kibana)  
+✅ Spring Boot Actuator health checks  
+✅ Correlation IDs for request tracking  
+
+### 🧪 Testing & Documentation
+✅ Unit tests (JUnit 5 + Mockito)  
+✅ Integration tests (Testcontainers)  
+✅ Postman collection (80+ endpoints)  
+✅ Swagger/OpenAPI documentation  
+✅ 10,000+ lines of comprehensive guides  
+
+### 🚀 Deployment & DevOps
+✅ Docker containerization  
+✅ Docker Compose orchestration  
+✅ Kubernetes manifests  
+✅ Helm charts  
+✅ Multiple deployment scripts  
+✅ Cloud deployment guides (AWS, GCP, Azure, Railway)  
+
+## 📋 Table of Contents
+
+- [Complete Documentation](#-complete-documentation-10000-lines)
+- [Technology Stack](#️-technology-stack)
+- [Architecture Overview](#️-architecture-overview)
+- [Quick Start](#-quick-start)
+- [Service URLs](#-service-urls-after-startup)
+- [What's Running in Docker](#-whats-running-in-docker)
+- [Manual Build & Run](#️-manual-build--run-development)
+- [API Testing with Postman](#-api-testing-with-postman)
+- [Key Concepts Covered](#-key-concepts-covered)
+- [Database Strategy](#️-database-strategy)
+- [Security](#-security)
+- [Monitoring & Observability](#-monitoring--observability)
+- [Testing](#-testing)
+- [API Documentation](#-api-documentation)
+- [Project Structure](#️-project-structure)
+- [Development](#-development)
+- [Learning Resources](#-learning-resources)
+- [Troubleshooting](#-troubleshooting)
+- [Production Deployment](#-production-deployment)
+
 ## 📚 Complete Documentation (10,000+ lines)
 
 This project includes comprehensive guides for every aspect:
 
-### Core Guides
-- **[README.md](README.md)** - Quick start guide (this file)
-- **[ARCHITECTURE.md](ARCHITECTURE.md)** - Complete system architecture
-- **[LEARNING_PATH.md](LEARNING_PATH.md)** - Week-by-week learning guide for beginners
+### Quick Start & Getting Started
+- **[README.md](README.md)** - Complete overview and quick start (this file)
+- **[START_HERE.md](START_HERE.md)** - Absolute beginner's guide
+- **[QUICK_START.md](QUICK_START.md)** - Fast setup for all experience levels
+- **[LEARNING_PATH.md](LEARNING_PATH.md)** - Week-by-week learning guide
 
-### Technical Guides
+### Core Technical Guides
+- **[ARCHITECTURE.md](ARCHITECTURE.md)** - Complete system architecture & design
 - **[AUTH_GUIDE.md](AUTH_GUIDE.md)** - OAuth2, JWT, Social Login, 2FA comprehensive guide
-- **[MULTITHREADING_GUIDE.md](MULTITHREADING_GUIDE.md)** - Threading & concurrency guide
+- **[MULTITHREADING_GUIDE.md](MULTITHREADING_GUIDE.md)** - Threading & concurrency patterns
 - **[SYSTEM_DESIGN_PATTERNS.md](SYSTEM_DESIGN_PATTERNS.md)** - 20+ design patterns explained
 - **[API_DOCUMENTATION.md](API_DOCUMENTATION.md)** - All 80+ API endpoints documented
 - **[DATABASE_SCHEMA.md](DATABASE_SCHEMA.md)** - PostgreSQL & MongoDB schemas
 
-### Operations Guides
+### Deployment & Operations
 - **[DEPLOYMENT.md](DEPLOYMENT.md)** - Complete production deployment guide
+- **[DEPLOYMENT_OPTIONS.md](DEPLOYMENT_OPTIONS.md)** - Comparing deployment strategies
+- **[CLOUD_DEPLOYMENT_GUIDE.md](CLOUD_DEPLOYMENT_GUIDE.md)** - Railway, AWS, GCP, Azure deployment
+- **[DOCKER_MEMORY_FIX.md](DOCKER_MEMORY_FIX.md)** - Docker memory optimization guide
+
+### Testing & Verification
 - **[TESTING_GUIDE.md](TESTING_GUIDE.md)** - Comprehensive testing strategies
 - **[POSTMAN_GUIDE.md](POSTMAN_GUIDE.md)** - API testing with Postman collection
+- **[POSTMAN_SETUP_GUIDE.md](POSTMAN_SETUP_GUIDE.md)** - Detailed Postman configuration
+- **[VERIFICATION_SUMMARY.md](VERIFICATION_SUMMARY.md)** - Project verification checklist
+
+### Project Status
+- **[PROJECT_STATUS.md](PROJECT_STATUS.md)** - Current implementation status
+- **[FINAL_STATUS.md](FINAL_STATUS.md)** - Final project completion report
+
+## 🛠️ Technology Stack
+
+### Core Technologies
+- **Java 21** - Latest LTS version with Virtual Threads
+- **Spring Boot 3.2+** - Framework for microservices
+- **Spring Cloud** - Microservices patterns (Gateway, Config, Discovery)
+- **Gradle 8.5+** - Build automation and dependency management
+
+### Databases
+- **PostgreSQL** - Relational data (Auth, User, Order, Payment services)
+- **MongoDB** - Document data (Product, Review, Notification services)
+- **Redis** - Caching and session storage
+
+### Message Queue & Communication
+- **Apache Kafka** - Event streaming and async messaging
+- **gRPC** - High-performance RPC (Review service)
+- **WebSocket** - Real-time notifications
+
+### Infrastructure & DevOps
+- **Docker & Docker Compose** - Containerization
+- **Kubernetes** - Container orchestration
+- **Helm** - Kubernetes package manager
+- **Netflix Eureka** - Service discovery
+- **Spring Cloud Gateway** - API Gateway with rate limiting
+
+### Monitoring & Observability
+- **Prometheus** - Metrics collection
+- **Grafana** - Metrics visualization
+- **Zipkin** - Distributed tracing
+- **ELK Stack** - Logging (Elasticsearch, Logstash, Kibana)
+- **Spring Boot Actuator** - Health checks and metrics
+
+### Security
+- **Spring Security** - Authentication and authorization
+- **OAuth2** - Authorization framework
+- **JWT** - Stateless token-based auth
+- **BCrypt** - Password hashing
+
+### Testing
+- **JUnit 5** - Unit testing
+- **Mockito** - Mocking framework
+- **Testcontainers** - Integration testing with containers
+- **Postman** - API testing (80+ endpoints included)
+
+### Resilience & Reliability
+- **Resilience4j** - Circuit breaker, retry, rate limiting
+- **Spring Retry** - Retry logic
+- **Caffeine** - In-memory caching
 
 ## 🏗️ Architecture Overview
 
-This platform consists of **10 microservices** implementing enterprise-grade patterns:
+This platform consists of **10 microservices** (3 infrastructure + 7 business) implementing enterprise-grade patterns:
 
 ### Infrastructure Services
 - **API Gateway** (Port 8080) - Single entry point, routing, rate limiting, circuit breaking
@@ -52,24 +208,40 @@ This platform consists of **10 microservices** implementing enterprise-grade pat
 
 ### Choose Your Setup
 
+| Setup Option | RAM Required | Startup Time | Services | Use Case |
+|-------------|--------------|--------------|----------|----------|
+| **Minimal** | 2-3 GB | 8-10 min | 5 core + 2 DBs | Learning, testing basic features |
+| **Light** | 6-8 GB | 10-12 min | 7 services + infrastructure | Development, most features |
+| **Full** | 12-16 GB | 10-15 min | All 10 services + monitoring | Complete experience, production simulation |
+| **Cloud** | 0 GB (remote) | Varies | All services | Production, 24/7 availability |
+
 #### Option 1: Minimal Setup (Recommended for < 8GB Docker RAM)
 **Perfect for:** Testing, learning, low-resource systems  
-**Memory:** 2-3 GB | **Time:** 8-10 minutes | **Services:** 5 core + 2 DBs
+**Includes:** Auth, User, Product, Order services + PostgreSQL, MongoDB
 
 ```bash
 ./start-minimal.sh
 ```
 
-#### Option 2: Full Setup (Requires 12-16GB Docker RAM)
+#### Option 2: Light Setup (Recommended for 8-12GB Docker RAM)
+**Perfect for:** Development without monitoring stack  
+**Includes:** All 7 business services + infrastructure services + databases
+
+```bash
+./start-local-light.sh
+```
+
+#### Option 3: Full Setup (Requires 12-16GB Docker RAM)
 **Perfect for:** Full-stack development, production simulation  
-**Memory:** 12-16 GB | **Time:** 10-15 minutes | **Services:** All 21 containers
+**Includes:** All microservices + Kafka + Monitoring (Prometheus, Grafana, Zipkin, ELK)
 
 ```bash
 ./start-local.sh
 ```
 
-#### Option 3: Cloud Deployment (Zero local resources!)
+#### Option 4: Cloud Deployment (Zero local resources!)
 **Perfect for:** Production, 24/7 availability  
+**Includes:** All services deployed on cloud infrastructure  
 See **[CLOUD_DEPLOYMENT_GUIDE.md](CLOUD_DEPLOYMENT_GUIDE.md)** for Railway, AWS, GCP, Azure
 
 **📖 Detailed guide:** [QUICK_START.md](QUICK_START.md) | [DEPLOYMENT_OPTIONS.md](DEPLOYMENT_OPTIONS.md)
@@ -504,30 +676,127 @@ Authorization: Bearer {accessToken}
 ## 🏗️ Project Structure
 
 ```
-ecommerce-microservices/
+backend-learning/
 ├── infrastructure/                    # Infrastructure services
-│   ├── api-gateway/                   # API Gateway
+│   ├── api-gateway/                   # API Gateway (Spring Cloud Gateway)
+│   │   ├── src/
+│   │   ├── Dockerfile
+│   │   └── build.gradle
 │   ├── service-discovery/             # Eureka Server
-│   └── config-server/                 # Config Server
-├── services/                          # Business services
+│   │   ├── src/
+│   │   ├── Dockerfile
+│   │   └── build.gradle
+│   └── config-server/                 # Centralized Config Server
+│       ├── src/
+│       ├── Dockerfile
+│       └── build.gradle
+├── services/                          # Business microservices
 │   ├── auth-service/                  # Authentication & Authorization
-│   ├── user-service/                  # User Management
-│   ├── product-service/               # Product Catalog
-│   ├── order-service/                 # Order Management
-│   ├── payment-service/               # Payment Processing
-│   ├── notification-service/          # Notifications
-│   └── review-service/                # Reviews & Ratings
+│   │   ├── src/main/java/com/       # OAuth2, JWT, Social Login, 2FA
+│   │   ├── src/main/resources/       # application.yml, db migrations
+│   │   ├── Dockerfile
+│   │   ├── build.gradle
+│   │   └── README.md
+│   ├── user-service/                  # User Management (CQRS pattern)
+│   │   ├── src/main/java/com/
+│   │   ├── src/main/resources/
+│   │   ├── Dockerfile
+│   │   └── build.gradle
+│   ├── product-service/               # Product Catalog (Event Sourcing)
+│   │   ├── src/main/java/com/
+│   │   ├── src/main/resources/
+│   │   └── build.gradle
+│   ├── order-service/                 # Order Management (Saga pattern)
+│   │   ├── src/main/java/com/
+│   │   ├── src/main/resources/
+│   │   └── build.gradle
+│   ├── payment-service/               # Payment Processing (Circuit Breaker)
+│   │   ├── src/main/java/com/
+│   │   ├── src/main/resources/
+│   │   └── build.gradle
+│   ├── notification-service/          # Notifications (Multithreading, WebSocket)
+│   │   ├── src/main/java/com/
+│   │   ├── src/main/resources/
+│   │   └── build.gradle
+│   └── review-service/                # Reviews & Ratings (gRPC)
+│       ├── src/main/java/com/
+│       ├── src/proto/                 # Protocol Buffers definitions
+│       ├── src/main/resources/
+│       └── build.gradle
 ├── shared/                            # Shared libraries
-│   ├── common-lib/                    # Common utilities
-│   └── event-lib/                     # Event definitions
+│   ├── common-lib/                    # Common utilities, DTOs, exceptions
+│   │   ├── src/main/java/com/
+│   │   └── build.gradle
+│   └── event-lib/                     # Event definitions for Kafka
+│       ├── src/main/java/com/
+│       └── build.gradle
 ├── docker/                            # Docker configurations
-│   ├── docker-compose.yml
-│   ├── init-scripts/
+│   ├── docker-compose.yml             # Full stack (21 containers)
+│   ├── docker-compose.minimal.yml     # Minimal setup (7 containers)
+│   ├── init-scripts/                  # Database initialization scripts
+│   │   └── init-postgres.sh
+│   ├── logstash/
+│   │   └── logstash.conf
 │   └── prometheus/
-├── build.gradle                       # Root build file
-├── settings.gradle                    # Module definitions
+│       └── prometheus.yml
+├── k8s/                               # Kubernetes manifests
+│   ├── namespace.yaml
+│   ├── secrets.yaml
+│   ├── ingress.yaml
+│   ├── auth-service.yaml
+│   └── order-service.yaml
+├── helm/                              # Helm charts
+│   └── ecommerce/
+│       ├── Chart.yaml
+│       └── values.yaml
+├── postman/                           # Postman API collections
+│   ├── E-commerce-Microservices.postman_collection.json
+│   ├── Local.postman_environment.json
+│   ├── Development.postman_environment.json
+│   └── Production.postman_environment.json
+├── Startup & Deployment Scripts (root level)
+│   ├── start-minimal.sh               # Start minimal stack (2-3GB RAM)
+│   ├── start-local.sh                 # Start full stack (12-16GB RAM)
+│   ├── start-local-light.sh           # Start light stack (6-8GB RAM)
+│   ├── stop-local.sh                  # Stop all services
+│   ├── build-all-docker-images.sh     # Build all Docker images
+│   └── deploy-kubernetes.sh           # Deploy to K8s cluster
+├── Documentation/                     # Complete documentation (14 guides)
+│   ├── START_HERE.md
+│   ├── QUICK_START.md
+│   ├── ARCHITECTURE.md
+│   ├── AUTH_GUIDE.md
+│   ├── MULTITHREADING_GUIDE.md
+│   ├── SYSTEM_DESIGN_PATTERNS.md
+│   ├── API_DOCUMENTATION.md
+│   ├── DATABASE_SCHEMA.md
+│   ├── DEPLOYMENT.md
+│   ├── DEPLOYMENT_OPTIONS.md
+│   ├── CLOUD_DEPLOYMENT_GUIDE.md
+│   ├── TESTING_GUIDE.md
+│   ├── POSTMAN_GUIDE.md
+│   ├── POSTMAN_SETUP_GUIDE.md
+│   ├── VERIFICATION_SUMMARY.md
+│   ├── PROJECT_STATUS.md
+│   └── FINAL_STATUS.md
+├── build.gradle                       # Root Gradle build file
+├── settings.gradle                    # Multi-module project settings
+├── gradlew                            # Gradle wrapper (Unix)
+├── gradlew.bat                        # Gradle wrapper (Windows)
+├── .gitignore                         # Git ignore patterns
 └── README.md                          # This file
 ```
+
+### Key Directories Explained
+
+- **`infrastructure/`** - Core platform services that other services depend on
+- **`services/`** - Business domain microservices (7 services)
+- **`shared/`** - Reusable libraries shared across services
+- **`docker/`** - Docker Compose files and container configurations
+- **`k8s/`** - Kubernetes deployment manifests
+- **`helm/`** - Helm charts for K8s deployment
+- **`postman/`** - API testing collections with 80+ endpoints
+- **`build/`** - Generated build artifacts (ignored in git)
 
 ## 🔧 Development
 
@@ -569,39 +838,345 @@ ecommerce-microservices/
 
 ## 🐛 Troubleshooting
 
-### Service Not Registering with Eureka
-- Check if Eureka Server is running: `http://localhost:8761`
-- Verify `eureka.client.serviceUrl.defaultZone` in service config
-- Check service logs for connection errors
+### Common Issues & Solutions
 
-### Database Connection Issues
-- Verify Docker containers are running: `docker-compose ps`
-- Check database credentials in service configuration
-- Test connection: `docker exec -it ecommerce-postgres psql -U postgres`
+#### Docker Memory Issues
+**Problem:** Services crashing with "Out of Memory" errors
+**Solution:** 
+```bash
+# Check Docker memory allocation
+docker stats
 
-### Kafka Connection Issues
-- Check Zookeeper is running
-- Verify Kafka is started after Zookeeper
-- Check Kafka topics: `docker exec -it ecommerce-kafka kafka-topics --list --bootstrap-server localhost:9092`
+# Increase Docker Desktop memory to 12-16GB
+# Docker Desktop → Settings → Resources → Memory
+
+# Or use minimal setup
+./start-minimal.sh
+```
+See **[DOCKER_MEMORY_FIX.md](DOCKER_MEMORY_FIX.md)** for detailed solutions.
+
+#### Service Not Registering with Eureka
+**Problem:** Services not appearing in Eureka dashboard
+**Solution:**
+```bash
+# 1. Verify Eureka is running
+curl http://localhost:8761
+
+# 2. Check service logs
+docker logs ecommerce-auth-service
+
+# 3. Verify eureka.client.serviceUrl in application.yml
+# 4. Ensure proper startup order (Eureka → Config → Other services)
+```
+
+#### Database Connection Issues
+**Problem:** Services can't connect to PostgreSQL/MongoDB
+**Solution:**
+```bash
+# 1. Check containers are running
+docker-compose ps
+
+# 2. Test PostgreSQL connection
+docker exec -it ecommerce-postgres psql -U postgres -c "SELECT version();"
+
+# 3. Test MongoDB connection
+docker exec -it ecommerce-mongodb mongosh -u admin -p admin123 --eval "db.version()"
+
+# 4. Check database credentials in service application.yml
+# 5. Restart services if database started after service
+docker-compose restart auth-service user-service order-service
+```
+
+#### Kafka Connection Issues
+**Problem:** Services can't connect to Kafka
+**Solution:**
+```bash
+# 1. Check Zookeeper is running
+docker logs ecommerce-zookeeper
+
+# 2. Check Kafka is running
+docker logs ecommerce-kafka
+
+# 3. List topics
+docker exec -it ecommerce-kafka kafka-topics --list --bootstrap-server localhost:9092
+
+# 4. Check consumer groups
+docker exec -it ecommerce-kafka kafka-consumer-groups --bootstrap-server localhost:9092 --list
+
+# 5. Restart in correct order
+docker-compose restart zookeeper kafka
+```
+
+#### Port Already in Use
+**Problem:** `Port 8080 already in use` or similar
+**Solution:**
+```bash
+# Find process using port
+lsof -i :8080  # macOS/Linux
+netstat -ano | findstr :8080  # Windows
+
+# Kill process or change port in docker-compose.yml
+# Or stop all services first
+./stop-local.sh
+```
+
+#### API Gateway Not Routing
+**Problem:** 404 errors when accessing `/api/*` endpoints
+**Solution:**
+```bash
+# 1. Check Gateway is running
+curl http://localhost:8080/actuator/health
+
+# 2. Verify Eureka shows all services
+open http://localhost:8761
+
+# 3. Check Gateway logs
+docker logs ecommerce-api-gateway
+
+# 4. Test direct service access (bypass gateway)
+curl http://localhost:9001/actuator/health  # Auth Service
+```
+
+#### JWT Token Issues
+**Problem:** "Invalid token" or "Token expired" errors
+**Solution:**
+```bash
+# 1. Get new token via Postman "Login" request
+# 2. Verify token in environment variables
+# 3. Check token expiration time in auth-service/application.yml
+# 4. For development, increase token expiry:
+#    jwt.expiration: 86400000  # 24 hours
+```
+
+#### Services Won't Start
+**Problem:** Services fail during startup
+**Solution:**
+```bash
+# 1. Check logs for specific error
+docker-compose logs -f [service-name]
+
+# 2. Clean build and restart
+./stop-local.sh
+docker-compose down -v  # Remove volumes
+./gradlew clean build
+./start-local.sh
+
+# 3. Try minimal setup first
+./start-minimal.sh
+```
+
+### Getting Additional Help
+
+1. **Check Documentation:** Review relevant guide in documentation folder
+2. **View Logs:** `docker-compose logs -f [service-name]`
+3. **Check Eureka:** Verify service registration at http://localhost:8761
+4. **Health Checks:** Test each service health endpoint
+5. **Postman Tests:** Run Postman collection to verify APIs
+6. **Verification Guide:** See **[VERIFICATION_SUMMARY.md](VERIFICATION_SUMMARY.md)**
 
 ## 🚀 Production Deployment
 
-### Docker
+### Deployment Scripts Available
+
+```bash
+# Build Docker images for all services
+./build-all-docker-images.sh
+
+# Deploy to Kubernetes cluster
+./deploy-kubernetes.sh
+
+# Use different compose files
+docker-compose -f docker/docker-compose.yml up -d        # Full stack
+docker-compose -f docker/docker-compose.minimal.yml up -d # Minimal
+```
+
+### Docker Deployment
 Build all services as Docker images:
 ```bash
+# Using Gradle
 ./gradlew bootBuildImage
+
+# Or use build script
+./build-all-docker-images.sh
+
+# Push to registry
+docker tag ecommerce-auth-service:latest myregistry/auth-service:latest
+docker push myregistry/auth-service:latest
 ```
 
-### Kubernetes
+### Kubernetes Deployment
 Deploy to Kubernetes cluster:
 ```bash
+# Apply all manifests
+kubectl apply -f k8s/namespace.yaml
+kubectl apply -f k8s/secrets.yaml
 kubectl apply -f k8s/
+
+# Or use deployment script
+./deploy-kubernetes.sh
+
+# Using Helm
+helm install ecommerce ./helm/ecommerce
 ```
 
-### CI/CD
+### Cloud Deployment Options
+
+This project supports multiple cloud platforms. See **[CLOUD_DEPLOYMENT_GUIDE.md](CLOUD_DEPLOYMENT_GUIDE.md)** for detailed instructions:
+
+1. **Railway** - Easiest deployment, $5/month per service
+2. **AWS** - ECS/EKS with comprehensive AWS services
+3. **Google Cloud Platform** - GKE with managed services
+4. **Azure** - AKS with Azure services
+5. **DigitalOcean** - Kubernetes with affordable pricing
+6. **Heroku** - Simple container deployment
+
+### CI/CD Pipeline (Coming Soon)
 - GitHub Actions workflow in `.github/workflows/`
-- Automated testing and deployment
+- Automated testing on PR
+- Automated deployment to staging/production
 - Blue-green deployment strategy
+- Automated rollback on failures
+
+### Environment-Specific Configuration
+
+Use different Postman environments for testing:
+- **Local.postman_environment.json** - localhost:8080
+- **Development.postman_environment.json** - dev environment
+- **Production.postman_environment.json** - production environment
+
+See **[DEPLOYMENT_OPTIONS.md](DEPLOYMENT_OPTIONS.md)** and **[DEPLOYMENT.md](DEPLOYMENT.md)** for complete deployment guides.
+
+## 🎯 Quick Command Reference
+
+### Startup & Shutdown
+```bash
+# Start services
+./start-minimal.sh          # Minimal setup (2-3GB)
+./start-local-light.sh      # Light setup (6-8GB)
+./start-local.sh            # Full setup (12-16GB)
+
+# Stop all services
+./stop-local.sh
+
+# View running containers
+docker-compose ps
+
+# View logs
+docker-compose logs -f [service-name]
+docker-compose logs -f auth-service
+```
+
+### Build Commands
+```bash
+# Build all services
+./gradlew clean build
+
+# Build specific service
+./gradlew :services:auth-service:build
+
+# Build Docker images
+./build-all-docker-images.sh
+
+# Run tests
+./gradlew test
+./gradlew :services:auth-service:test
+```
+
+### Docker Commands
+```bash
+# View container stats
+docker stats
+
+# Restart specific service
+docker-compose restart auth-service
+
+# View container logs
+docker logs ecommerce-auth-service -f
+
+# Execute command in container
+docker exec -it ecommerce-postgres psql -U postgres
+docker exec -it ecommerce-mongodb mongosh -u admin -p admin123
+
+# Remove all containers and volumes
+docker-compose down -v
+```
+
+### Kafka Commands
+```bash
+# List topics
+docker exec -it ecommerce-kafka kafka-topics --list --bootstrap-server localhost:9092
+
+# View topic messages
+docker exec -it ecommerce-kafka kafka-console-consumer \
+  --bootstrap-server localhost:9092 \
+  --topic order.created --from-beginning
+
+# List consumer groups
+docker exec -it ecommerce-kafka kafka-consumer-groups \
+  --bootstrap-server localhost:9092 --list
+```
+
+### Database Commands
+```bash
+# PostgreSQL
+docker exec -it ecommerce-postgres psql -U postgres -d authdb
+docker exec -it ecommerce-postgres psql -U postgres -c "SELECT * FROM users;"
+
+# MongoDB
+docker exec -it ecommerce-mongodb mongosh -u admin -p admin123
+docker exec -it ecommerce-mongodb mongosh --eval "db.products.find().pretty()"
+
+# Redis
+docker exec -it ecommerce-redis redis-cli
+docker exec -it ecommerce-redis redis-cli KEYS "*"
+```
+
+### Health Checks
+```bash
+# Check service health
+curl http://localhost:8080/actuator/health        # API Gateway
+curl http://localhost:9001/actuator/health        # Auth Service
+curl http://localhost:8761                        # Eureka
+
+# Check all registered services
+curl http://localhost:8761/eureka/apps
+
+# View metrics
+curl http://localhost:8080/actuator/metrics
+```
+
+### Kubernetes Commands
+```bash
+# Deploy to K8s
+./deploy-kubernetes.sh
+
+# Or manually
+kubectl apply -f k8s/
+
+# View pods
+kubectl get pods -n ecommerce
+
+# View logs
+kubectl logs -f deployment/auth-service -n ecommerce
+
+# Port forward
+kubectl port-forward svc/api-gateway 8080:8080 -n ecommerce
+```
+
+### Gradle Commands
+```bash
+# List all tasks
+./gradlew tasks
+
+# Check dependencies
+./gradlew dependencies
+
+# Run specific service
+./gradlew :services:auth-service:bootRun
+
+# Clean build artifacts
+./gradlew clean
+```
 
 ## 📝 License
 
@@ -609,25 +1184,67 @@ This project is created for educational purposes to learn Spring Boot and micros
 
 ## 👨‍💻 Author
 
-E-commerce Platform Team - Learning Spring Boot Microservices
+Created by **Aditya Raj** - Backend Developer learning Spring Boot Microservices
+
+**Project Type:** Educational & Portfolio Project  
+**Purpose:** Comprehensive demonstration of microservices architecture, system design patterns, and modern backend development practices
 
 ## 🙏 Acknowledgments
 
-- Spring Boot and Spring Cloud teams
-- Netflix OSS (Eureka, Hystrix)
-- Resilience4j
-- Apache Kafka
-- All open-source contributors
+This project was built using amazing open-source technologies:
+
+- **Spring Framework** - Spring Boot, Spring Cloud, Spring Security teams
+- **Netflix OSS** - Eureka (Service Discovery)
+- **Resilience4j** - Fault tolerance library
+- **Apache Kafka** - Event streaming platform
+- **Docker** - Containerization platform
+- **Kubernetes** - Container orchestration
+- **PostgreSQL** - Robust relational database
+- **MongoDB** - Flexible document database
+- **Redis** - High-performance caching
+- All open-source contributors who make amazing tools freely available
 
 ---
 
-**Note**: This is a comprehensive learning project. Every line of code is documented to explain concepts clearly. Perfect for college students and developers learning backend development.
+## 📞 Support & Help
 
-## 📞 Support
+### Quick Help Resources
 
-For issues or questions:
-- Check documentation files in the project
-- Review inline code comments
-- Check Eureka dashboard for service status
-- View logs: `docker-compose logs -f {service-name}`
+1. **Start Here:** Read [START_HERE.md](START_HERE.md) for absolute beginners
+2. **Quick Start:** Follow [QUICK_START.md](QUICK_START.md) for fast setup
+3. **Memory Issues:** See [DOCKER_MEMORY_FIX.md](DOCKER_MEMORY_FIX.md)
+4. **API Testing:** Review [POSTMAN_SETUP_GUIDE.md](POSTMAN_SETUP_GUIDE.md)
+5. **Troubleshooting:** Check the [Troubleshooting](#-troubleshooting) section above
+6. **Verification:** Run through [VERIFICATION_SUMMARY.md](VERIFICATION_SUMMARY.md)
+
+### Debug Checklist
+
+When something doesn't work:
+- ✅ Check if Docker Desktop is running with adequate memory (8GB+)
+- ✅ Verify Eureka dashboard shows all services: http://localhost:8761
+- ✅ Check service logs: `docker-compose logs -f [service-name]`
+- ✅ Test health endpoints: `curl http://localhost:8080/actuator/health`
+- ✅ Review inline code comments for explanations
+- ✅ Check relevant documentation in the docs folder
+
+### Service Health Dashboard URLs
+
+After starting services, check these URLs:
+- **Eureka:** http://localhost:8761 - See all registered services
+- **API Gateway:** http://localhost:8080/actuator/health
+- **Zipkin:** http://localhost:9411 - Distributed tracing
+- **Prometheus:** http://localhost:9090 - Metrics
+- **Grafana:** http://localhost:3000 - Dashboards (admin/admin)
+- **Kafka UI:** http://localhost:8090 - Kafka topics
+
+---
+
+**Note**: This is a comprehensive learning project designed for education. Every service, pattern, and concept is implemented with detailed documentation and comments. Perfect for college students, bootcamp graduates, and developers learning backend development and microservices architecture.
+
+**Learning Approach:** Start with minimal setup → Understand core concepts → Expand to full setup → Deploy to cloud
+
+**Estimated Learning Time:** 
+- Basic understanding: 1-2 weeks
+- Intermediate mastery: 1 month  
+- Advanced implementation: 2-3 months
 
